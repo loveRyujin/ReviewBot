@@ -2,13 +2,69 @@ package cmd
 
 import (
 	"os"
+	"path/filepath"
+	"strings"
 
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
+)
+
+var (
+	configPath string
+	replacer   = strings.NewReplacer(".", "_", "-", "_")
+
+	defaultConfigDir  = ".config/reviewbot"
+	defaultConfigFile = ".reviewbot"
 )
 
 var rootCmd = &cobra.Command{
-	Use:   "CodeReview",
-	Short: "help code review when merging code",
+	Use:          "reviewbot",
+	Short:        "help code review when merging code",
+	SilenceUsage: true,
+}
+
+func init() {
+	cobra.OnInitialize(initConfig)
+	rootCmd.AddCommand(reviewCmd)
+
+	rootCmd.PersistentFlags().StringVarP(&configPath, "config", "c", "", "config file path")
+
+	rootCmd.CompletionOptions.HiddenDefaultCmd = true
+}
+
+// initConfig reads in config file and ENV variables.
+func initConfig() {
+	if configPath != "" {
+		viper.SetConfigFile(configPath)
+	} else {
+		for _, dir := range searchDirs() {
+			viper.AddConfigPath(dir)
+		}
+
+		viper.SetConfigName(defaultConfigFile)
+		viper.SetConfigType("yaml")
+
+		setupEnvironmentVariables()
+	}
+
+	if err := viper.ReadInConfig(); err != nil {
+		cobra.CheckErr(err)
+	}
+}
+
+// setupEnvironmentVariables sets up the environment variables for viper.
+func setupEnvironmentVariables() {
+	viper.AutomaticEnv()
+	viper.SetEnvPrefix("REVIEWBOT")
+	viper.SetEnvKeyReplacer(replacer)
+}
+
+// searchDirs returns the directories to search for the config file.
+func searchDirs() []string {
+	// get user home dir
+	homeDir, err := os.UserHomeDir()
+	cobra.CheckErr(err)
+	return []string{filepath.Join(homeDir, defaultConfigDir), ".", "./config"}
 }
 
 func Execute() {
