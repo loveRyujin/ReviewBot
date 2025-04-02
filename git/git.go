@@ -2,6 +2,7 @@ package git
 
 import (
 	"errors"
+	"fmt"
 	"os/exec"
 	"strconv"
 
@@ -77,6 +78,39 @@ func (cmd *Command) diffFiles() *exec.Cmd {
 		"git",
 		args...,
 	)
+}
+
+// commit constructs a git commit command with the provided commit message.
+// It includes the --signoff flag and optionally the --amend flag if cmd.isAmend is true.
+func (cmd *Command) commit(msg string) *exec.Cmd {
+	args := []string{
+		"commit",
+		"--signoff",
+		fmt.Sprintf("--message=%s", msg),
+	}
+
+	if cmd.isAmend {
+		args = append(args, "--amend")
+	}
+
+	return exec.Command(
+		"git",
+		args...,
+	)
+}
+
+// Commit executes a git commit with the provided message and returns the output.
+// If there are no staged changes, it returns an error prompting the user to stage files.
+func (cmd *Command) Commit(msg string) (string, error) {
+	output, err := cmd.commit(msg).Output()
+	if err != nil {
+		return "", err
+	}
+	if len(output) == 0 {
+		return "", errors.New("please add your staged changes using git add <files...>")
+	}
+
+	return string(output), nil
 }
 
 func (cmd *Command) DiffFiles() (string, error) {
