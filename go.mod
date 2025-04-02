@@ -1,4 +1,4 @@
-module github.com/loveRyujin/GitCodeReviewer
+module github.com/loveRyujin/ReviewBot
 
 go 1.24.0
 

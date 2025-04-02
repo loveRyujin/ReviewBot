@@ -6,7 +6,7 @@ import (
 	"os/exec"
 	"strconv"
 
-	"github.com/loveRyujin/GitCodeReviewer/git/options"
+	"github.com/loveRyujin/ReviewBot/git/options"
 )
 
 var excludeFromDiff = []string{
