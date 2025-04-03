@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"github.com/loveRyujin/ReviewBot/ai"
+	"github.com/loveRyujin/ReviewBot/llm"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -25,6 +27,23 @@ var reviewCmd = &cobra.Command{
 		if err := opts.Validate(); err != nil {
 			return err
 		}
+
+		g := opts.GitConfig().New()
+		diff, err := g.DiffFiles()
+		if err != nil {
+			return err
+		}
+
+		provider := ai.Provider("viper.provider")
+		client, err := llm.GetModelClient(provider)
+		if err != nil {
+			return err
+		}
+		resp, err := client.ChatCompletion(cmd.Context(), diff)
+		if err != nil {
+			return err
+		}
+		_ = resp
 
 		return nil
 	},

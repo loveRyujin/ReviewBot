@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"os/exec"
 	"strconv"
-
-	"github.com/loveRyujin/ReviewBot/git/options"
 )
 
 var excludeFromDiff = []string{
@@ -129,15 +127,15 @@ func (cmd *Command) DiffFiles() (string, error) {
 	return string(output), nil
 }
 
+type Config struct {
+	DiffUnified  int
+	ExcludedList []string
+	IsAmend      bool
+}
+
 // New creates a new Command instance with the provided options.
 // It applies the given options to configure the Command and returns it.
-func New(opts ...options.Option) *Command {
-	cfg := &options.Config{}
-
-	for _, opt := range opts {
-		opt.Apply(cfg)
-	}
-
+func (cfg *Config) New() *Command {
 	command := &Command{
 		diffUnified:  cfg.DiffUnified,
 		excludedList: append(excludeFromDiff, cfg.ExcludedList...),

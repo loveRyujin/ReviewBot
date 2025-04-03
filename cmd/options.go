@@ -3,6 +3,7 @@ package cmd
 import (
 	"errors"
 
+	"github.com/loveRyujin/ReviewBot/git"
 	"github.com/loveRyujin/ReviewBot/util"
 	"github.com/spf13/viper"
 )
@@ -23,6 +24,14 @@ func (s *ServerOptions) Validate() error {
 	}
 
 	return nil
+}
+
+func (s *ServerOptions) GitConfig() *git.Config {
+	return &git.Config{
+		DiffUnified:  s.GitOptions.DiffUnified,
+		ExcludedList: s.GitOptions.ExcludedList,
+		IsAmend:      s.GitOptions.Amend,
+	}
 }
 
 // ApplyCfg applies user-provided configuration from the command line.
