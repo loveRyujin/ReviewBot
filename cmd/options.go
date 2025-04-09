@@ -8,13 +8,21 @@ import (
 	"github.com/spf13/viper"
 )
 
+var ServerOption *ServerOptions
+
+func init() {
+	ServerOption = NewServerOptions()
+}
+
 type ServerOptions struct {
 	GitOptions *GitOptions `mapstructure:"git"`
+	AiOptions  *AiOptions  `mapstructure:"ai"`
 }
 
 func NewServerOptions() *ServerOptions {
 	return &ServerOptions{
 		GitOptions: NewGitOptions(),
+		AiOptions:  NewAiOptions(),
 	}
 }
 
@@ -74,4 +82,14 @@ func (g *GitOptions) Validate() error {
 	}
 
 	return nil
+}
+
+type AiOptions struct {
+	Provider string `mapstructure:"provider"`
+}
+
+func NewAiOptions() *AiOptions {
+	return &AiOptions{
+		Provider: "openai",
+	}
 }

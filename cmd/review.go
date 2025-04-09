@@ -11,30 +11,28 @@ var reviewCmd = &cobra.Command{
 	Use:   "review",
 	Short: "Auto review code changes in git stage",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		opts := NewServerOptions()
-
 		// applies user-provided configuration from the command line
-		if err := opts.ApplyCfg(); err != nil {
+		if err := ServerOption.ApplyCfg(); err != nil {
 			return err
 		}
 
 		// reads in config file and ENV variables
-		if err := viper.Unmarshal(opts); err != nil {
+		if err := viper.Unmarshal(ServerOption); err != nil {
 			return err
 		}
 
 		// validates the options
-		if err := opts.Validate(); err != nil {
+		if err := ServerOption.Validate(); err != nil {
 			return err
 		}
 
-		g := opts.GitConfig().New()
+		g := ServerOption.GitConfig().New()
 		diff, err := g.DiffFiles()
 		if err != nil {
 			return err
 		}
 
-		provider := ai.Provider("viper.provider")
+		provider := ai.Provider(ServerOption.AiOptions.Provider)
 		client, err := llm.GetModelClient(provider)
 		if err != nil {
 			return err
