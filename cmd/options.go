@@ -2,17 +2,18 @@ package cmd
 
 import (
 	"errors"
+	"sync"
 
 	"github.com/loveRyujin/ReviewBot/git"
+	"github.com/loveRyujin/ReviewBot/llm/openai"
 	"github.com/loveRyujin/ReviewBot/util"
 	"github.com/spf13/viper"
 )
 
-var ServerOption *ServerOptions
-
-func init() {
-	ServerOption = NewServerOptions()
-}
+var (
+	ServerOption *ServerOptions
+	once         sync.Once
+)
 
 type ServerOptions struct {
 	GitOptions *GitOptions `mapstructure:"git"`
@@ -26,8 +27,28 @@ func NewServerOptions() *ServerOptions {
 	}
 }
 
-func (s *ServerOptions) Validate() error {
-	if err := s.GitOptions.Validate(); err != nil {
+func (s *ServerOptions) Initialize() error {
+	once.Do(func() {
+		s = NewServerOptions()
+	})
+
+	if err := s.applyCfg(); err != nil {
+		return err
+	}
+
+	if err := viper.Unmarshal(s); err != nil {
+		return err
+	}
+
+	if err := s.validate(); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *ServerOptions) validate() error {
+	if err := s.GitOptions.validate(); err != nil {
 		return err
 	}
 
@@ -42,11 +63,21 @@ func (s *ServerOptions) GitConfig() *git.Config {
 	}
 }
 
-// ApplyCfg applies user-provided configuration from the command line.
+func (s *ServerOptions) OpenaiConfig() *openai.Config {
+	return &openai.Config{
+		ApiKey:      s.AiOptions.ApiKey,
+		Model:       s.AiOptions.Model,
+		MaxTokens:   s.AiOptions.MaxTokens,
+		Temperature: s.AiOptions.Temperature,
+		TopP:        s.AiOptions.TopP,
+	}
+}
+
+// applyCfg applies user-provided configuration from the command line.
 // It ensures the "git" command is available in the system PATH and updates
 // configuration settings such as the number of unified lines for diffs
 // and the list of excluded items.
-func (s *ServerOptions) ApplyCfg() error {
+func (s *ServerOptions) applyCfg() error {
 	if !util.IsCommandAvailable("git") {
 		return errors.New("git command not found in your system PATH, Please install git")
 	}
@@ -76,7 +107,7 @@ func NewGitOptions() *GitOptions {
 	}
 }
 
-func (g *GitOptions) Validate() error {
+func (g *GitOptions) validate() error {
 	if g.DiffUnified < 0 {
 		return errors.New("diff_unified must be a non-negative integer")
 	}
@@ -85,11 +116,21 @@ func (g *GitOptions) Validate() error {
 }
 
 type AiOptions struct {
-	Provider string `mapstructure:"provider"`
+	Provider    string  `mapstructure:"provider"`
+	ApiKey      string  `mapstructure:"api_key"`
+	Model       string  `mapstructure:"model"`
+	MaxTokens   int     `mapstructure:"max_tokens"`
+	Temperature float32 `mapstructure:"temperature"`
+	TopP        float32 `mapstructure:"top_p"`
 }
 
 func NewAiOptions() *AiOptions {
 	return &AiOptions{
-		Provider: "openai",
+		Provider:    "openai",
+		ApiKey:      "xxxxxx",
+		Model:       "gpt-3.5-turbo",
+		MaxTokens:   1000,
+		Temperature: 0.7,
+		TopP:        1.0,
 	}
 }
