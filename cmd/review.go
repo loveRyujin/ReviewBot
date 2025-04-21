@@ -1,6 +1,9 @@
 package cmd
 
 import (
+	"strings"
+
+	"github.com/fatih/color"
 	"github.com/loveRyujin/ReviewBot/ai"
 	"github.com/spf13/cobra"
 )
@@ -28,7 +31,13 @@ var reviewCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		_ = resp
+		summary := resp.Text
+		color.Magenta(resp.TokenUsage.String())
+
+		// Output core review summary
+		color.Yellow("================Review Summary====================")
+		color.Yellow("\n" + strings.TrimSpace(summary) + "\n\n")
+		color.Yellow("==================================================")
 
 		return nil
 	},
