@@ -15,6 +15,12 @@ var (
 	once         sync.Once
 )
 
+func init() {
+	once.Do(func() {
+		ServerOption = NewServerOptions()
+	})
+}
+
 type ServerOptions struct {
 	GitOptions *GitOptions `mapstructure:"git"`
 	AiOptions  *AiOptions  `mapstructure:"ai"`
@@ -28,10 +34,6 @@ func NewServerOptions() *ServerOptions {
 }
 
 func (s *ServerOptions) Initialize() error {
-	once.Do(func() {
-		s = NewServerOptions()
-	})
-
 	if err := s.applyCfg(); err != nil {
 		return err
 	}
