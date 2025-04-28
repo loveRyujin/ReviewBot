@@ -77,7 +77,8 @@ type Config struct {
 }
 
 func (cfg *Config) New() (*Client, error) {
-	client := openai.NewClient(cfg.ApiKey)
+	c := openai.DefaultConfig(cfg.ApiKey)
+	client := openai.NewClientWithConfig(c)
 	return &Client{
 		client:      client,
 		model:       cfg.Model,
