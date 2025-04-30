@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/loveRyujin/ReviewBot/ai"
+	"github.com/loveRyujin/ReviewBot/proxy"
 	"github.com/sashabaranov/go-openai"
 )
 
@@ -69,15 +70,21 @@ func (c *Client) chatCompletion(ctx context.Context, text string) (*Response, er
 }
 
 type Config struct {
-	ApiKey      string
-	Model       string
-	MaxTokens   int
-	Temperature float32
-	TopP        float32
+	ApiKey           string
+	Model            string
+	MaxTokens        int
+	Temperature      float32
+	TopP             float32
+	PresencePenalty  float32
+	FrequencyPenalty float32
 }
 
-func (cfg *Config) New() (*Client, error) {
+func (cfg *Config) New(proxyCfg *proxy.Config) (*Client, error) {
 	c := openai.DefaultConfig(cfg.ApiKey)
+
+	httpClient := proxyCfg.New()
+	c.HTTPClient = &httpClient
+
 	client := openai.NewClientWithConfig(c)
 	return &Client{
 		client:      client,

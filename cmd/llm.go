@@ -8,7 +8,8 @@ import (
 )
 
 func NewOpenAIClient() (*openai.Client, error) {
-	return ServerOption.OpenaiConfig().New()
+	proxyCfg := ServerOption.ProxyConfig()
+	return ServerOption.OpenaiConfig().New(proxyCfg)
 }
 
 func GetModelClient(provider ai.Provider) (ai.TextGenerator, error) {

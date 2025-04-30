@@ -3,9 +3,11 @@ package cmd
 import (
 	"errors"
 	"sync"
+	"time"
 
 	"github.com/loveRyujin/ReviewBot/git"
 	"github.com/loveRyujin/ReviewBot/llm/openai"
+	"github.com/loveRyujin/ReviewBot/proxy"
 	"github.com/loveRyujin/ReviewBot/util"
 	"github.com/spf13/viper"
 )
@@ -22,14 +24,16 @@ func init() {
 }
 
 type ServerOptions struct {
-	GitOptions *GitOptions `mapstructure:"git"`
-	AiOptions  *AiOptions  `mapstructure:"ai"`
+	GitOptions   *GitOptions   `mapstructure:"git"`
+	AiOptions    *AiOptions    `mapstructure:"ai"`
+	ProxyOptions *ProxyOptions `mapstructure:"proxy"`
 }
 
 func NewServerOptions() *ServerOptions {
 	return &ServerOptions{
-		GitOptions: NewGitOptions(),
-		AiOptions:  NewAiOptions(),
+		GitOptions:   NewGitOptions(),
+		AiOptions:    NewAiOptions(),
+		ProxyOptions: NewProxyOptions(),
 	}
 }
 
@@ -54,6 +58,10 @@ func (s *ServerOptions) validate() error {
 		return err
 	}
 
+	if err := s.AiOptions.validate(); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -72,6 +80,16 @@ func (s *ServerOptions) OpenaiConfig() *openai.Config {
 		MaxTokens:   s.AiOptions.MaxTokens,
 		Temperature: s.AiOptions.Temperature,
 		TopP:        s.AiOptions.TopP,
+	}
+}
+
+func (s *ServerOptions) ProxyConfig() *proxy.Config {
+	return &proxy.Config{
+		ProxyURL:   s.ProxyOptions.ProxyURL,
+		SocksURL:   s.ProxyOptions.SocksURL,
+		Timeout:    s.ProxyOptions.Timeout,
+		Headers:    s.ProxyOptions.Headers,
+		SkipVerify: s.ProxyOptions.SkipVerify,
 	}
 }
 
@@ -118,12 +136,14 @@ func (g *GitOptions) validate() error {
 }
 
 type AiOptions struct {
-	Provider    string  `mapstructure:"provider"`
-	ApiKey      string  `mapstructure:"api_key"`
-	Model       string  `mapstructure:"model"`
-	MaxTokens   int     `mapstructure:"max_tokens"`
-	Temperature float32 `mapstructure:"temperature"`
-	TopP        float32 `mapstructure:"top_p"`
+	Provider         string  `mapstructure:"provider"`
+	ApiKey           string  `mapstructure:"api_key"`
+	Model            string  `mapstructure:"model"`
+	MaxTokens        int     `mapstructure:"max_tokens"`
+	Temperature      float32 `mapstructure:"temperature"`
+	TopP             float32 `mapstructure:"top_p"`
+	PresencePenalty  float32 `mapstructure:"presence_penalty"`
+	FrequencyPenalty float32 `mapstructure:"frequency_penalty"`
 }
 
 func NewAiOptions() *AiOptions {
@@ -134,5 +154,35 @@ func NewAiOptions() *AiOptions {
 		MaxTokens:   1000,
 		Temperature: 0.7,
 		TopP:        1.0,
+	}
+}
+
+func (a *AiOptions) validate() error {
+	if a.Provider == "" {
+		return errors.New("provider cannot be empty")
+	}
+
+	if a.ApiKey == "" {
+		return errors.New("api_key cannot be empty")
+	}
+
+	return nil
+}
+
+type ProxyOptions struct {
+	ProxyURL   string        `mapstructure:"proxy_url"`
+	SocksURL   string        `mapstructure:"socks_url"`
+	Timeout    time.Duration `mapstructure:"timeout"`
+	Headers    []string      `mapstructure:"headers"`
+	SkipVerify bool          `mapstructure:"skip_verify"`
+}
+
+func NewProxyOptions() *ProxyOptions {
+	return &ProxyOptions{
+		ProxyURL:   "",
+		SocksURL:   "",
+		Timeout:    30 * time.Second,
+		Headers:    []string{},
+		SkipVerify: false,
 	}
 }
