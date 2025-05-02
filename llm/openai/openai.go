@@ -82,8 +82,8 @@ type Config struct {
 func (cfg *Config) New(proxyCfg *proxy.Config) (*Client, error) {
 	c := openai.DefaultConfig(cfg.ApiKey)
 
-	httpClient := proxyCfg.New()
-	c.HTTPClient = &httpClient
+	httpClient, _ := proxyCfg.New()
+	c.HTTPClient = httpClient
 
 	client := openai.NewClientWithConfig(c)
 	return &Client{

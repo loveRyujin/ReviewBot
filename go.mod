@@ -8,6 +8,7 @@ require (
 	github.com/sashabaranov/go-openai v1.38.1
 	github.com/spf13/cobra v1.9.1
 	github.com/spf13/viper v1.20.1
+	golang.org/x/net v0.33.0
 )
 
 require (
