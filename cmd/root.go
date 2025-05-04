@@ -4,6 +4,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -14,7 +15,9 @@ var (
 	replacer   = strings.NewReplacer(".", "_", "-", "_")
 
 	defaultConfigDir  = ".config/reviewbot"
-	defaultConfigFile = ".reviewbot"
+	defaultConfigFile = "reviewbot.yaml"
+
+	once sync.Once
 )
 
 var rootCmd = &cobra.Command{
@@ -31,6 +34,10 @@ func init() {
 	rootCmd.PersistentFlags().StringVarP(&configPath, "config", "c", "", "config file path")
 
 	rootCmd.CompletionOptions.HiddenDefaultCmd = true
+
+	once.Do(func() {
+		ServerOption = NewServerOptions()
+	})
 }
 
 // initConfig reads in config file and ENV variables.
@@ -44,9 +51,9 @@ func initConfig() {
 
 		viper.SetConfigName(defaultConfigFile)
 		viper.SetConfigType("yaml")
-
-		setupEnvironmentVariables()
 	}
+
+	setupEnvironmentVariables()
 
 	if err := viper.ReadInConfig(); err != nil {
 		cobra.CheckErr(err)
@@ -65,7 +72,7 @@ func searchDirs() []string {
 	// get user home dir
 	homeDir, err := os.UserHomeDir()
 	cobra.CheckErr(err)
-	return []string{filepath.Join(homeDir, defaultConfigDir), ".", "./config"}
+	return []string{filepath.Join(homeDir, defaultConfigDir), ".", "./config/"}
 }
 
 func Execute() {

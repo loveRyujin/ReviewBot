@@ -27,6 +27,8 @@ var reviewCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
+
+		color.Cyan("We are trying to review code changes")
 		resp, err := client.ChatCompletion(cmd.Context(), diff)
 		if err != nil {
 			return err

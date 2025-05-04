@@ -70,6 +70,7 @@ func (c *Client) chatCompletion(ctx context.Context, text string) (*Response, er
 }
 
 type Config struct {
+	BaseURL          string
 	ApiKey           string
 	Model            string
 	MaxTokens        int
@@ -81,6 +82,9 @@ type Config struct {
 
 func (cfg *Config) New(proxyCfg *proxy.Config) (*Client, error) {
 	c := openai.DefaultConfig(cfg.ApiKey)
+	if cfg.BaseURL != "" {
+		c.BaseURL = cfg.BaseURL
+	}
 
 	httpClient, _ := proxyCfg.New()
 	c.HTTPClient = httpClient

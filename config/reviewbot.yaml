@@ -1,0 +1,11 @@
+git:
+  diff_unified: 3
+  exclude_list: [go.sum]
+  amend: false
+ai:
+  provider: openai
+  base_url: https://api.deepseek.com
+  model: deepseek-chat
+  api_key: "xxx"
+proxy:
+  skip_verify: true

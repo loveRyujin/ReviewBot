@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"errors"
-	"sync"
 	"time"
 
 	"github.com/loveRyujin/ReviewBot/git"
@@ -14,14 +13,7 @@ import (
 
 var (
 	ServerOption *ServerOptions
-	once         sync.Once
 )
-
-func init() {
-	once.Do(func() {
-		ServerOption = NewServerOptions()
-	})
-}
 
 type ServerOptions struct {
 	GitOptions   *GitOptions   `mapstructure:"git"`
@@ -75,6 +67,7 @@ func (s *ServerOptions) GitConfig() *git.Config {
 
 func (s *ServerOptions) OpenaiConfig() *openai.Config {
 	return &openai.Config{
+		BaseURL:     s.AiOptions.BaseURL,
 		ApiKey:      s.AiOptions.ApiKey,
 		Model:       s.AiOptions.Model,
 		MaxTokens:   s.AiOptions.MaxTokens,
@@ -138,6 +131,7 @@ func (g *GitOptions) validate() error {
 type AiOptions struct {
 	Provider         string  `mapstructure:"provider"`
 	ApiKey           string  `mapstructure:"api_key"`
+	BaseURL          string  `mapstructure:"base_url"`
 	Model            string  `mapstructure:"model"`
 	MaxTokens        int     `mapstructure:"max_tokens"`
 	Temperature      float32 `mapstructure:"temperature"`
