@@ -11,8 +11,9 @@ import (
 )
 
 var (
-	configPath string
-	replacer   = strings.NewReplacer(".", "_", "-", "_")
+	configPath       string
+	defaultEnvPrefix = "REVIEWBOT"
+	replacer         = strings.NewReplacer(".", "_", "-", "_")
 
 	defaultConfigDir  = ".config/reviewbot"
 	defaultConfigFile = "reviewbot.yaml"
@@ -63,7 +64,7 @@ func initConfig() {
 // setupEnvironmentVariables sets up the environment variables for viper.
 func setupEnvironmentVariables() {
 	viper.AutomaticEnv()
-	viper.SetEnvPrefix("REVIEWBOT")
+	viper.SetEnvPrefix(defaultEnvPrefix)
 	viper.SetEnvKeyReplacer(replacer)
 }
 

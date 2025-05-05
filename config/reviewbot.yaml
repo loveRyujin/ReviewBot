@@ -4,8 +4,6 @@ git:
   amend: false
 ai:
   provider: openai
-  base_url: https://api.deepseek.com
-  model: deepseek-chat
-  api_key: "xxx"
+  model: gpt-3.5-turbo
 proxy:
   skip_verify: true
