@@ -1,9 +1,10 @@
-git:
-  diff_unified: 3
-  exclude_list: [go.sum]
-  amend: false
 ai:
-  provider: openai
-  model: gpt-3.5-turbo
+    model: gpt-3.5-turbo
+    provider: openai
+git:
+    amend: false
+    diff_unified: 3
+    exclude_list:
+        - go.sum
 proxy:
-  skip_verify: true
+    skip_verify: true
