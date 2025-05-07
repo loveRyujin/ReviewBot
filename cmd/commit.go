@@ -1,6 +1,9 @@
 package cmd
 
-import "github.com/spf13/cobra"
+import (
+	"github.com/loveRyujin/ReviewBot/ai"
+	"github.com/spf13/cobra"
+)
 
 var (
 	diffUnifiedLines int
@@ -18,6 +21,28 @@ var commitCmd = &cobra.Command{
 	Use:   "commit",
 	Short: "Automically generate commit message",
 	RunE: func(cmd *cobra.Command, args []string) error {
+		if err := ServerOption.Initialize(); err != nil {
+			return err
+		}
+
+		g := ServerOption.GitConfig().New()
+		diff, err := g.DiffFiles()
+		if err != nil {
+			return err
+		}
+
+		provider := ai.Provider(ServerOption.AiOptions.Provider)
+		client, err := GetModelClient(provider)
+		if err != nil {
+			return err
+		}
+
+		resp, err := client.ChatCompletion(cmd.Context(), diff)
+		if err != nil {
+			return err
+		}
+		summary := resp.Text
+		_ = summary
 
 		return nil
 	},
