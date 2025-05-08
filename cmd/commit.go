@@ -1,7 +1,10 @@
 package cmd
 
 import (
+	"github.com/fatih/color"
 	"github.com/loveRyujin/ReviewBot/ai"
+	"github.com/loveRyujin/ReviewBot/git"
+	"github.com/loveRyujin/ReviewBot/prompt"
 	"github.com/spf13/cobra"
 )
 
@@ -25,24 +28,83 @@ var commitCmd = &cobra.Command{
 			return err
 		}
 
+		// generate diff info
 		g := ServerOption.GitConfig().New()
 		diff, err := g.DiffFiles()
 		if err != nil {
 			return err
 		}
 
+		currentModel := ServerOption.AiOptions.Model
 		provider := ai.Provider(ServerOption.AiOptions.Provider)
 		client, err := GetModelClient(provider)
 		if err != nil {
 			return err
 		}
+		// get file diff summary prompt
+		instruction, err := prompt.GetFileDiffSummaryTmpl(prompt.FileDiff, diff)
+		if err != nil {
+			return err
+		}
 
-		resp, err := client.ChatCompletion(cmd.Context(), diff)
+		color.Green("Using %s model for commit message generation\n", currentModel)
+		color.Green("We are trying to generate commit message\n")
+
+		// generate file diff summary
+		color.Cyan("Generating file diff summary...\n")
+		resp, err := client.ChatCompletion(cmd.Context(), instruction)
 		if err != nil {
 			return err
 		}
 		summary := resp.Text
-		_ = summary
+		color.Magenta(resp.TokenUsage.String())
+
+		// generate commit message prefix
+		color.Cyan("Generating commit message prefix...\n")
+		instruction, err = prompt.GetCommitMessagePrefixTmpl(prompt.SummaryPoint, summary)
+		if err != nil {
+			return err
+		}
+		resp, err = client.ChatCompletion(cmd.Context(), instruction)
+		if err != nil {
+			return err
+		}
+		prefix := resp.Text
+		color.Magenta(resp.TokenUsage.String())
+
+		// generate commit message title
+		color.Cyan("Generating commit message title...\n")
+		instruction, err = prompt.GetCommitMessageTitleTmpl(prompt.SummaryPoint, summary)
+		if err != nil {
+			return err
+		}
+		resp, err = client.ChatCompletion(cmd.Context(), instruction)
+		if err != nil {
+			return err
+		}
+		title := resp.Text
+		color.Magenta(resp.TokenUsage.String())
+
+		// generate commit message
+		commitMsg, err := git.GetCommitMessageTmpl(map[string]any{
+			git.CommitMessagePrefix:  prefix,
+			git.CommitMessageTitle:   title,
+			git.CommitMessageSummary: summary,
+		})
+		if err != nil {
+			return err
+		}
+
+		// Output commit message from AI
+		color.Yellow("================Commit Summary====================")
+		color.Yellow("\n" + commitMsg + "\n\n")
+		color.Yellow("==================================================")
+
+		output, err := g.Commit(commitMsg)
+		if err != nil {
+			return err
+		}
+		color.Yellow(output)
 
 		return nil
 	},

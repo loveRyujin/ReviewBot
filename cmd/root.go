@@ -31,6 +31,7 @@ func init() {
 	cobra.OnInitialize(initConfig)
 	rootCmd.AddCommand(reviewCmd)
 	rootCmd.AddCommand(configCmd)
+	rootCmd.AddCommand(commitCmd)
 
 	rootCmd.PersistentFlags().StringVarP(&configPath, "config", "c", "", "config file path")
 
