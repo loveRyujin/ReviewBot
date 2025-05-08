@@ -43,7 +43,7 @@ var commitCmd = &cobra.Command{
 			return err
 		}
 		// get file diff summary prompt for commit message
-		instruction, err := prompt.GetFileDiffSummaryTmplForCommit(prompt.FileDiff, diff)
+		instruction, err := prompt.GetPromptTmpl(prompt.CommitFileDiffTmpl, map[string]any{prompt.FileDiff: diff})
 		if err != nil {
 			return err
 		}
@@ -62,7 +62,7 @@ var commitCmd = &cobra.Command{
 
 		// generate commit message prefix
 		color.Cyan("Generating commit message prefix...\n")
-		instruction, err = prompt.GetCommitMessagePrefixTmpl(prompt.SummaryPoint, summary)
+		instruction, err = prompt.GetPromptTmpl(prompt.CommitMessagePrefixTmpl, map[string]any{prompt.SummaryPoint: summary})
 		if err != nil {
 			return err
 		}
@@ -75,7 +75,7 @@ var commitCmd = &cobra.Command{
 
 		// generate commit message title
 		color.Cyan("Generating commit message title...\n")
-		instruction, err = prompt.GetCommitMessageTitleTmpl(prompt.SummaryPoint, summary)
+		instruction, err = prompt.GetPromptTmpl(prompt.CommitMessageTitleTmpl, map[string]any{prompt.SummaryPoint: summary})
 		if err != nil {
 			return err
 		}

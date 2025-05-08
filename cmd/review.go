@@ -35,7 +35,7 @@ var reviewCmd = &cobra.Command{
 			return err
 		}
 		// get file diff summary prompt for code review
-		instruction, err := prompt.GetFileDiffSummaryTmplForReview(prompt.FileDiff, diff)
+		instruction, err := prompt.GetPromptTmpl(prompt.CodeReviewFileDiffTmpl, map[string]any{prompt.FileDiff: diff})
 		if err != nil {
 			return err
 		}
