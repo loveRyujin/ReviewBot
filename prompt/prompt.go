@@ -7,15 +7,33 @@ import (
 )
 
 const (
-	FileDiff     = "file_diff"
+	FileDiff     = "file_diffs"
 	SummaryPoint = "summary_point"
 )
 
 //go:embed template/*
 var templateFS embed.FS
 
-func GetFileDiffSummaryTmpl(placeHolder string, data any) (string, error) {
+func GetFileDiffSummaryTmplForCommit(placeHolder string, data any) (string, error) {
 	output, err := templateFS.ReadFile("template/summarize_file_diff.tmpl")
+	if err != nil {
+		return "", err
+	}
+	tmpl, err := template.New("").Parse(string(output))
+	if err != nil {
+		return "", err
+	}
+
+	var buf bytes.Buffer
+	if err := tmpl.Execute(&buf, map[string]any{placeHolder: data}); err != nil {
+		return "", err
+	}
+
+	return buf.String(), nil
+}
+
+func GetFileDiffSummaryTmplForReview(placeHolder string, data any) (string, error) {
+	output, err := templateFS.ReadFile("template/code_review_file_diff.tmpl")
 	if err != nil {
 		return "", err
 	}

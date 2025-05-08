@@ -5,9 +5,15 @@ import (
 
 	"github.com/fatih/color"
 	"github.com/loveRyujin/ReviewBot/ai"
+	"github.com/loveRyujin/ReviewBot/prompt"
 	"github.com/spf13/cobra"
 )
 
+// reviewCmd represents the "review" command which automates the process of
+// reviewing code changes in the git staging area. It initializes the server
+// configuration, generates a diff of staged files, and uses an AI provider
+// to analyze the changes and provide a review summary. The review summary
+// is then displayed to the user in a formatted output.
 var reviewCmd = &cobra.Command{
 	Use:   "review",
 	Short: "Auto review code changes in git stage",
@@ -16,6 +22,7 @@ var reviewCmd = &cobra.Command{
 			return err
 		}
 
+		// generate diff info
 		g := ServerOption.GitConfig().New()
 		diff, err := g.DiffFiles()
 		if err != nil {
@@ -27,9 +34,14 @@ var reviewCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
+		// get file diff summary prompt for code review
+		instruction, err := prompt.GetFileDiffSummaryTmplForReview(prompt.FileDiff, diff)
+		if err != nil {
+			return err
+		}
 
 		color.Cyan("We are trying to review code changes")
-		resp, err := client.ChatCompletion(cmd.Context(), diff)
+		resp, err := client.ChatCompletion(cmd.Context(), instruction)
 		if err != nil {
 			return err
 		}

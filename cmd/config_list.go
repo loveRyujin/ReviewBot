@@ -37,6 +37,9 @@ var availableKeys = map[string]string{
 	"prompt.folder":        "Directory path for custom prompt templates",
 }
 
+// configListCmd represents the "list" command which lists all configuration settings.
+// It displays the settings in a formatted table with the configuration name and value.
+// Sensitive information like "openai.api_key" is masked for security purposes.
 var configListCmd = &cobra.Command{
 	Use:   "list",
 	Short: "List all configuration settings",

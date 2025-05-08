@@ -13,6 +13,13 @@ func init() {
 	configCmd.AddCommand(configSetCmd)
 }
 
+// configSetCmd represents the "set" command which allows users to set a
+// configuration value. It requires at least two arguments: a key and a value.
+// The command validates the key against a predefined list of available keys
+// and updates the configuration using Viper. If the key is "git.exclude_list",
+// the value is split into a list using commas. The updated configuration is
+// then written to the configuration file. On success, a confirmation message
+// is displayed with the path to the configuration file.
 var configSetCmd = &cobra.Command{
 	Use:   "set",
 	Short: "Set configuration value",

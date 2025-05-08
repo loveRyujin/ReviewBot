@@ -20,6 +20,7 @@ func init() {
 	commitCmd.PersistentFlags().BoolVar(&amend, "amend", false, "amend the commit message")
 }
 
+// commitCmd is a Cobra command that automates the generation of commit messages
 var commitCmd = &cobra.Command{
 	Use:   "commit",
 	Short: "Automically generate commit message",
@@ -41,8 +42,8 @@ var commitCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		// get file diff summary prompt
-		instruction, err := prompt.GetFileDiffSummaryTmpl(prompt.FileDiff, diff)
+		// get file diff summary prompt for commit message
+		instruction, err := prompt.GetFileDiffSummaryTmplForCommit(prompt.FileDiff, diff)
 		if err != nil {
 			return err
 		}
