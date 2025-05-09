@@ -25,10 +25,17 @@ Flags:
 Use "reviewbot [command] --help" for more information about a command.
 ```  
 
-从源码安装(需要go版本为1.24.0以上)：
+从源码安装（需要go version为1.24.0以上）：
 ```sh
 go install github.com/loveRyujin/ReviewBot/cmd/reviewbot@latest
 ```
+
+下载源码编译（go version同上）：
+```sh
+git clone https://github.com/loveRyujin/ReviewBot.git
+make build
+```
+同时支持编译不同平台的二进制文件，具体参考Makefile。
 
 ## 功能
 - 帮助生成git commit message（遵循conventional commits规范）
