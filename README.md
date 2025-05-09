@@ -25,9 +25,9 @@ Flags:
 Use "reviewbot [command] --help" for more information about a command.
 ```  
 
-从源码安装：
+从源码安装(需要go版本为1.24.0以上)：
 ```sh
-go install github.com/loveRyujin/ReviewBot/cmd/reviewbot
+go install github.com/loveRyujin/ReviewBot/cmd/reviewbot@latest
 ```
 
 ## 功能
@@ -38,6 +38,11 @@ go install github.com/loveRyujin/ReviewBot/cmd/reviewbot
 - 支持proxy配置
 
 ## 使用方法
+### 配置方法
+- 命令行参数（可用 -h | --help 对对应命令的命令行参数进行查看）
+- 环境变量（以REVIEWBOT为前缀，_进行拼接，如REVIEWBOT_AI_BASE_URL,对应ai.base_url这个配置项）
+- yaml配置文件（会从三个地方读取配置：~/.config/reviwebot/reviewbot.yaml、项目根目录、根目录下的config目录，优先级按照顺序从低到高）
+
 ### 生成git commit message
 ```sh
 git add .
