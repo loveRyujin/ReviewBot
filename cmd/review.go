@@ -72,12 +72,14 @@ var reviewCmd = &cobra.Command{
 			if len(diff) == 0 {
 				return errors.New("please provide the diff content to review")
 			}
-		} else {
+		} else if mode == ModeLocal {
 			g := ServerOption.GitConfig().New()
 			diff, err = g.DiffFiles()
 			if err != nil {
 				return err
 			}
+		} else {
+			return errors.New("invalid mode, please use 'local' or 'external'")
 		}
 
 		provider := ai.Provider(ServerOption.AiOptions.Provider)
