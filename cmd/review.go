@@ -46,39 +46,33 @@ var reviewCmd = &cobra.Command{
 		// generate diff info
 		var diff string
 		var err error
-		if mode == ModeExternal {
+
+		switch mode {
+		case ModeLocal:
+			g := ServerOption.GitConfig().New()
+			diff, err = g.DiffFiles()
+			if err != nil {
+				return err
+			}
+		case ModeExternal:
 			if len(args) != 0 { // if args is not empty, use the first argument as the diff content
 				diff = args[0]
 			} else if diffFile != "" { // if diffFile is provided, read the content from the file
-				file, err := os.Open(diffFile)
-				if err != nil {
-					return err
-				}
-				defer file.Close()
-
-				diff, err = processInput(file)
+				diff, err = processFileInput(diffFile)
 				if err != nil {
 					return err
 				}
 			} else { // if no args or diffFile is provided, read from stdin
-				if hasStdinInput() {
-					diff, err = processInput(os.Stdin)
-					if err != nil {
-						return err
-					}
+				diff, err = processStdinInput()
+				if err != nil {
+					return err
 				}
 			}
 
 			if len(diff) == 0 {
 				return errors.New("please provide the diff content to review")
 			}
-		} else if mode == ModeLocal {
-			g := ServerOption.GitConfig().New()
-			diff, err = g.DiffFiles()
-			if err != nil {
-				return err
-			}
-		} else {
+		default:
 			return errors.New("invalid mode, please use 'local' or 'external'")
 		}
 
@@ -110,9 +104,43 @@ var reviewCmd = &cobra.Command{
 	},
 }
 
+// processFileInput reads the diff content from a file
+func processFileInput(filepath string) (string, error) {
+	file, err := os.Open(filepath)
+	if err != nil {
+		return "", err
+	}
+	defer file.Close()
+
+	diff, err := processInput(file)
+	if err != nil {
+		return "", err
+	}
+
+	return diff, nil
+}
+
+// processStdinInput reads the diff content from stdin
+func processStdinInput() (string, error) {
+	if !hasStdinInput() {
+		return "", nil
+	}
+
+	diff, err := processInput(os.Stdin)
+	if err != nil {
+		return "", err
+	}
+
+	return diff, nil
+}
+
 // hasStdinInput checks if there is input from stdin.
 func hasStdinInput() bool {
-	fi, _ := os.Stdin.Stat()
+	fi, err := os.Stdin.Stat()
+	if err != nil {
+		cobra.CheckErr(err)
+	}
+
 	return (fi.Mode() & os.ModeCharDevice) == 0
 }
 
