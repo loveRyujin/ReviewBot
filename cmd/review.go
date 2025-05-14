@@ -20,6 +20,8 @@ const (
 var (
 	mode     string
 	diffFile string
+
+	maxInputSize int
 )
 
 func init() {
@@ -28,6 +30,7 @@ func init() {
 	reviewCmd.PersistentFlags().BoolVar(&amend, "amend", false, "amend the commit message")
 	reviewCmd.PersistentFlags().StringVar(&mode, "mode", ModeLocal, "mode of fetch git diff information (local or external)")
 	reviewCmd.PersistentFlags().StringVar(&diffFile, "diff_file", "", "path of the diff file to be reviewed")
+	reviewCmd.PersistentFlags().IntVar(&maxInputSize, "max_input_size", 20*1024*1024, "maximum git diff input size(default: 20MB, units: bytes)")
 }
 
 // reviewCmd represents the "review" command which automates the process of
@@ -56,6 +59,10 @@ var reviewCmd = &cobra.Command{
 			}
 		case ModeExternal:
 			if len(args) != 0 { // if args is not empty, use the first argument as the diff content
+				if len(args[0]) >= maxInputSize {
+					return errors.New("git diff input size exceeds limit")
+				}
+
 				diff = args[0]
 			} else if diffFile != "" { // if diffFile is provided, read the content from the file
 				diff, err = processFileInput(diffFile)
@@ -112,6 +119,14 @@ func processFileInput(filepath string) (string, error) {
 	}
 	defer file.Close()
 
+	allowed, err := checkFileSize(file)
+	if err != nil {
+		return "", err
+	}
+	if !allowed {
+		return "", errors.New("git diff input size exceeds limit")
+	}
+
 	diff, err := processInput(file)
 	if err != nil {
 		return "", err
@@ -124,6 +139,14 @@ func processFileInput(filepath string) (string, error) {
 func processStdinInput() (string, error) {
 	if !hasStdinInput() {
 		return "", nil
+	}
+
+	allowed, err := checkFileSize(os.Stdin)
+	if err != nil {
+		return "", err
+	}
+	if !allowed {
+		return "", errors.New("git diff input size exceeds limit")
 	}
 
 	diff, err := processInput(os.Stdin)
@@ -147,4 +170,18 @@ func hasStdinInput() bool {
 func processInput(r io.Reader) (string, error) {
 	diffContent, err := io.ReadAll(r)
 	return string(diffContent), err
+}
+
+// checkFileSize checks if the file size is valid(less than 20MB).
+func checkFileSize(f *os.File) (bool, error) {
+	stat, err := f.Stat()
+	if err != nil {
+		return false, err
+	}
+
+	if stat.Size() >= int64(maxInputSize) {
+		return false, nil
+	}
+
+	return true, nil
 }
