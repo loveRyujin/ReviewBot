@@ -5,6 +5,8 @@ import (
 )
 
 var keyToEnv = map[string]string{
+	"git.diff_file":        "GIT_DIFF_FILE",
+	"git.max_input_size":   "GIT_MAX_INPUT_SIZE",
 	"git.diff_unified":     "GIT_DIFF_UNIFIED",
 	"git.exclude_list":     "GIT_EXCLUDE_LIST",
 	"git.template_file":    "GIT_TEMPLATE_FILE",

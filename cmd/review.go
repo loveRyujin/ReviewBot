@@ -59,13 +59,13 @@ var reviewCmd = &cobra.Command{
 			}
 		case ModeExternal:
 			if len(args) != 0 { // if args is not empty, use the first argument as the diff content
-				if len(args[0]) >= maxInputSize {
+				if len(args[0]) >= ServerOption.GitOptions.MaxInputSize {
 					return errors.New("git diff input size exceeds limit")
 				}
 
 				diff = args[0]
 			} else if diffFile != "" { // if diffFile is provided, read the content from the file
-				diff, err = processFileInput(diffFile)
+				diff, err = processFileInput(ServerOption.GitOptions.DiffFile)
 				if err != nil {
 					return err
 				}
@@ -179,7 +179,7 @@ func checkFileSize(f *os.File) (bool, error) {
 		return false, err
 	}
 
-	if stat.Size() >= int64(maxInputSize) {
+	if stat.Size() >= int64(ServerOption.GitOptions.MaxInputSize) {
 		return false, nil
 	}
 

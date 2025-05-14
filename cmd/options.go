@@ -103,10 +103,20 @@ func (s *ServerOptions) applyCfg() error {
 		viper.Set("git.exclude_list", excludedList)
 	}
 
+	if diffFile != "" {
+		viper.Set("git.diff_file", diffFile)
+	}
+
+	if maxInputSize != 20*1024*1024 {
+		viper.Set("git.max_input_size", maxInputSize)
+	}
+
 	return nil
 }
 
 type GitOptions struct {
+	DiffFile     string   `mapstructure:"diff_file"`
+	MaxInputSize int      `mapstructure:"max_input_size"`
 	DiffUnified  int      `mapstructure:"diff_unified"`
 	ExcludedList []string `mapstructure:"exclude_list"`
 	Amend        bool     `mapstructure:"amend"`
@@ -114,6 +124,7 @@ type GitOptions struct {
 
 func NewGitOptions() *GitOptions {
 	return &GitOptions{
+		MaxInputSize: 20 * 1024 * 1024,
 		DiffUnified:  3,
 		ExcludedList: []string{},
 		Amend:        false,
@@ -123,6 +134,10 @@ func NewGitOptions() *GitOptions {
 func (g *GitOptions) validate() error {
 	if g.DiffUnified < 0 {
 		return errors.New("diff_unified must be a non-negative integer")
+	}
+
+	if g.MaxInputSize <= 0 {
+		return errors.New("max_input_size must be a positive integer")
 	}
 
 	return nil

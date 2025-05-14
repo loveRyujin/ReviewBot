@@ -15,6 +15,8 @@ func init() {
 
 // availableKeys is a map of configuration keys and their descriptions
 var availableKeys = map[string]string{
+	"git.diff_file":        "Path to the diff file to be reviewed",
+	"git.max_input_size":   "Maximum git diff input size (default: 20MB, units: bytes)",
 	"git.diff_unified":     "Number of context lines in git diff output (default: 3)",
 	"git.exclude_list":     "Files to exclude from git diff command",
 	"git.template_file":    "Path to template file for commit messages",
@@ -48,7 +50,7 @@ var configListCmd = &cobra.Command{
 		columnFmt := color.New(color.FgYellow).SprintfFunc()
 
 		// Create a new table with the header "Config Name" and "Value"
-		tbl := table.New("Config Name", "Value")
+		tbl := table.New("Config Name", "Value", "Description")
 		tbl.WithHeaderFormatter(headerFmt).WithFirstColumnFormatter(columnFmt)
 
 		// Sort the keys
@@ -63,10 +65,10 @@ var configListCmd = &cobra.Command{
 		for _, v := range keys {
 			// Hide the api key
 			if v == "openai.api_key" {
-				tbl.AddRow(v, "****************")
+				tbl.AddRow(v, "****************", availableKeys[v])
 				continue
 			}
-			tbl.AddRow(v, viper.Get(v))
+			tbl.AddRow(v, viper.Get(v), availableKeys[v])
 		}
 
 		// Print the table
