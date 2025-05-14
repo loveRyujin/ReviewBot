@@ -1,6 +1,9 @@
 package cmd
 
 import (
+	"errors"
+	"io"
+	"os"
 	"strings"
 
 	"github.com/fatih/color"
@@ -8,6 +11,24 @@ import (
 	"github.com/loveRyujin/ReviewBot/prompt"
 	"github.com/spf13/cobra"
 )
+
+const (
+	ModeLocal    = "local"
+	ModeExternal = "external"
+)
+
+var (
+	mode     string
+	diffFile string
+)
+
+func init() {
+	reviewCmd.PersistentFlags().IntVar(&diffUnifiedLines, "diff_unified", 3, "number of context lines to show in diff")
+	reviewCmd.PersistentFlags().StringArrayVar(&excludedList, "exclude_list", []string{}, "list of files to exclude from review")
+	reviewCmd.PersistentFlags().BoolVar(&amend, "amend", false, "amend the commit message")
+	reviewCmd.PersistentFlags().StringVar(&mode, "mode", ModeLocal, "mode of fetch git diff information (local or external)")
+	reviewCmd.PersistentFlags().StringVar(&diffFile, "diff_file", "", "path of the diff file to be reviewed")
+}
 
 // reviewCmd represents the "review" command which automates the process of
 // reviewing code changes in the git staging area. It initializes the server
@@ -23,10 +44,40 @@ var reviewCmd = &cobra.Command{
 		}
 
 		// generate diff info
-		g := ServerOption.GitConfig().New()
-		diff, err := g.DiffFiles()
-		if err != nil {
-			return err
+		var diff string
+		var err error
+		if mode == ModeExternal {
+			if len(args) != 0 { // if args is not empty, use the first argument as the diff content
+				diff = args[0]
+			} else if diffFile != "" { // if diffFile is provided, read the content from the file
+				file, err := os.Open(diffFile)
+				if err != nil {
+					return err
+				}
+				defer file.Close()
+
+				diff, err = processInput(file)
+				if err != nil {
+					return err
+				}
+			} else { // if no args or diffFile is provided, read from stdin
+				if hasStdinInput() {
+					diff, err = processInput(os.Stdin)
+					if err != nil {
+						return err
+					}
+				}
+			}
+
+			if len(diff) == 0 {
+				return errors.New("please provide the diff content to review")
+			}
+		} else {
+			g := ServerOption.GitConfig().New()
+			diff, err = g.DiffFiles()
+			if err != nil {
+				return err
+			}
 		}
 
 		provider := ai.Provider(ServerOption.AiOptions.Provider)
@@ -55,4 +106,15 @@ var reviewCmd = &cobra.Command{
 
 		return nil
 	},
+}
+
+// hasStdinInput checks if there is input from stdin.
+func hasStdinInput() bool {
+	fi, _ := os.Stdin.Stat()
+	return (fi.Mode() & os.ModeCharDevice) == 0
+}
+
+func processInput(r io.Reader) (string, error) {
+	diffContent, err := io.ReadAll(r)
+	return string(diffContent), err
 }
