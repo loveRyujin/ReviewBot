@@ -69,6 +69,32 @@ func (c *Client) chatCompletion(ctx context.Context, text string) (*Response, er
 	}, nil
 }
 
+// StreamChatCompletion streams the chat completion response.
+func (c *Client) StreamChatCompletion(ctx context.Context, text string) (*openai.ChatCompletionStream, error) {
+	req := openai.ChatCompletionRequest{
+		Model:       c.model,
+		MaxTokens:   c.maxTokens,
+		Temperature: c.temperature,
+		TopP:        c.topP,
+		Messages: []openai.ChatCompletionMessage{
+			{
+				Role:    openai.ChatMessageRoleAssistant,
+				Content: "You are a helpful assistant.",
+			},
+			{
+				Role:    openai.ChatMessageRoleUser,
+				Content: text,
+			},
+		},
+		Stream: true,
+		StreamOptions: &openai.StreamOptions{
+			IncludeUsage: true,
+		},
+	}
+
+	return c.client.CreateChatCompletionStream(ctx, req)
+}
+
 type Config struct {
 	BaseURL          string
 	ApiKey           string

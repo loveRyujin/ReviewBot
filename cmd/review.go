@@ -22,6 +22,7 @@ var (
 	diffFile     string
 	maxInputSize int
 	outputLang   string
+	stream       bool
 )
 
 func init() {
@@ -32,6 +33,7 @@ func init() {
 	reviewCmd.PersistentFlags().StringVar(&diffFile, "diff_file", "", "path of the diff file to be reviewed")
 	reviewCmd.PersistentFlags().IntVar(&maxInputSize, "max_input_size", 20*1024*1024, "maximum git diff input size(default: 20MB, units: bytes)")
 	reviewCmd.PersistentFlags().StringVar(&outputLang, "output_lang", "en", "output language of the review summary(default: English)")
+	reviewCmd.PersistentFlags().BoolVar(&stream, "stream", false, "enable streaming mode for AI provider")
 }
 
 // reviewCmd represents the "review" command which automates the process of
@@ -81,7 +83,7 @@ var reviewCmd = &cobra.Command{
 				return errors.New("please provide the diff content to review")
 			}
 		default:
-			return errors.New("invalid mode, please use 'local' or 'external'")
+			return errors.New("invalid input mode, please use 'local' or 'external'")
 		}
 
 		provider := ai.Provider(ServerOption.AiOptions.Provider)
@@ -96,38 +98,121 @@ var reviewCmd = &cobra.Command{
 		}
 
 		color.Cyan("We are trying to review code changes")
-		resp, err := client.ChatCompletion(cmd.Context(), instruction)
-		if err != nil {
-			return err
-		}
-		summary := resp.Text
-		color.Magenta(resp.TokenUsage.String())
 
 		lang := prompt.GetLanguage(ServerOption.GitOptions.Lang)
-		if lang != prompt.DefaultLanguage {
-			// get translation prompt
-			instruction, err := prompt.GetPromptTmpl(prompt.TranslationTmpl, map[string]any{
-				prompt.OutputLang:    ServerOption.GitOptions.Lang,
-				prompt.OutputMessage: resp.Text,
-			})
-			if err != nil {
-				return err
-			}
+		yellow := color.New(color.FgYellow).PrintfFunc()
+		if stream { // streaming mode
+			if lang != prompt.DefaultLanguage {
+				resp, err := client.ChatCompletion(cmd.Context(), instruction)
+				if err != nil {
+					return err
+				}
+				summary := resp.Text
+				color.Magenta(resp.TokenUsage.String())
 
-			// translate the summary to the specified language
-			color.Cyan("We are trying to translate the code review summary to " + lang)
+				instruction, err = prompt.GetPromptTmpl(prompt.TranslationTmpl, map[string]any{
+					prompt.OutputLang:    lang,
+					prompt.OutputMessage: summary,
+				})
+				if err != nil {
+					return err
+				}
+
+				color.Cyan("We are trying to translate the code review summary to " + lang + " in streaming mode")
+				stream, err := client.StreamChatCompletion(cmd.Context(), instruction)
+				if err != nil {
+					return err
+				}
+				defer stream.Close()
+
+				color.Yellow("================Review Summary====================" + "\n\n")
+
+				tokenUsage := ai.TokenUsage{}
+				for {
+					resp, err := stream.Recv()
+					if err != nil {
+						if errors.Is(err, io.EOF) {
+							color.Yellow("\n" + "==================================================")
+							break
+						}
+						return err
+					}
+
+					yellow(resp.Choices[0].Delta.Content)
+
+					if resp.Usage != nil {
+						tokenUsage.PromptTokens = resp.Usage.PromptTokens
+						tokenUsage.CompletionTokens = resp.Usage.CompletionTokens
+						tokenUsage.TotalTokens = resp.Usage.TotalTokens
+						tokenUsage.PromptTokensDetails = resp.Usage.PromptTokensDetails
+						tokenUsage.CompletionTokensDetails = resp.Usage.CompletionTokensDetails
+					}
+				}
+				color.Magenta(tokenUsage.String())
+			} else {
+				stream, err := client.StreamChatCompletion(cmd.Context(), instruction)
+				if err != nil {
+					return err
+				}
+				defer stream.Close()
+
+				color.Yellow("================Review Summary====================" + "\n\n")
+
+				tokenUsage := ai.TokenUsage{}
+				for {
+					resp, err := stream.Recv()
+					if err != nil {
+						if errors.Is(err, io.EOF) {
+							color.Yellow("\n" + "==================================================")
+							break
+						}
+						return err
+					}
+
+					yellow("%s", resp.Choices[0].Delta.Content)
+
+					if resp.Usage != nil {
+						tokenUsage.PromptTokens = resp.Usage.PromptTokens
+						tokenUsage.CompletionTokens = resp.Usage.CompletionTokens
+						tokenUsage.TotalTokens = resp.Usage.TotalTokens
+						tokenUsage.PromptTokensDetails = resp.Usage.PromptTokensDetails
+						tokenUsage.CompletionTokensDetails = resp.Usage.CompletionTokensDetails
+					}
+				}
+				color.Magenta(tokenUsage.String())
+			}
+		} else { // non-streaming mode
 			resp, err := client.ChatCompletion(cmd.Context(), instruction)
 			if err != nil {
 				return err
 			}
-			summary = resp.Text
+			summary := resp.Text
 			color.Magenta(resp.TokenUsage.String())
-		}
 
-		// Output core review summary
-		color.Yellow("================Review Summary====================")
-		color.Yellow("\n" + strings.TrimSpace(summary) + "\n\n")
-		color.Yellow("==================================================")
+			if lang != prompt.DefaultLanguage {
+				// get translation prompt
+				instruction, err := prompt.GetPromptTmpl(prompt.TranslationTmpl, map[string]any{
+					prompt.OutputLang:    ServerOption.GitOptions.Lang,
+					prompt.OutputMessage: summary,
+				})
+				if err != nil {
+					return err
+				}
+
+				color.Cyan("We are trying to translate the code review summary to " + lang)
+				resp, err = client.ChatCompletion(cmd.Context(), instruction)
+				if err != nil {
+					return err
+				}
+				summary = resp.Text
+				color.Magenta(resp.TokenUsage.String())
+			}
+
+			// Output core review summary
+			color.Yellow("================Review Summary====================")
+			color.Yellow("\n" + strings.TrimSpace(summary) + "\n\n")
+			color.Yellow("==================================================")
+		}
 
 		return nil
 	},

@@ -35,4 +35,5 @@ type Response struct {
 
 type TextGenerator interface {
 	ChatCompletion(ctx context.Context, text string) (*Response, error)
+	StreamChatCompletion(ctx context.Context, text string) (*openai.ChatCompletionStream, error)
 }

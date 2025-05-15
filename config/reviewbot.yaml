@@ -10,3 +10,4 @@ git:
         - go.sum
 proxy:
     skip_verify: true
+    timeout: 60s
