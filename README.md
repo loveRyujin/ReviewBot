@@ -40,9 +40,13 @@ make build
 ## 功能
 - 帮助生成git commit message（遵循conventional commits规范）
 - 帮助进行code review，针对代码变更生成对应的建议
+- 支持输出指定翻译语言
+- 支持流式输出
+- 支持外部输入git diff信息（标准输入、文件、命令行参数）
 - 支持自定义git diff生成的差异上下文行数
 - 支持选择让git diff忽略的文件
 - 支持proxy配置
+- 支持替换base_url
 
 ## 使用方法
 ### 配置方法
@@ -77,3 +81,34 @@ reviewbot config set ai.api_key xxxxxx
 ```
 更新成功输出类似下面：
 ![config_set](./images/config_set.png)
+
+### 流式输出（review命令支持）
+指定 --stream=true
+```sh
+reviewbot review --stream=true
+```
+
+### 指定语言翻译（review命令支持）
+指定 --output_lang=lang，支持（en、zh-cn、zh-tw、jp）  
+
+```sh
+reviewbot review --output_lang=zh-cn
+```
+### 从外部源获取git diff
+指定 --mode=external  
+
+- 标准输入（管道、重定向）
+```sh
+git add .
+git diff --staged | reviewbot review --mode=external
+```
+- 文件
+```sh
+git add .
+git diff --staged > git_diff.txt
+reviewbot review --mode=external --diff_file=git_diff.txt
+```
+- 命令行参数
+```sh
+reviewbot review --mode=external your_git_diff_content
+```
