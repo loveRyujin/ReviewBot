@@ -13,10 +13,13 @@ const (
 	CommitMessagePrefixTmpl = "conventional_commit.tmpl"
 	CommitMessageTitleTmpl  = "summarize_title.tmpl"
 	CommitFileDiffTmpl      = "summarize_file_diff.tmpl"
+	TranslationTmpl         = "translation.tmpl"
 
 	// PlaceHolders
-	FileDiff     = "file_diffs"
-	SummaryPoint = "summary_points"
+	FileDiff      = "file_diffs"
+	SummaryPoint  = "summary_points"
+	OutputLang    = "output_language"
+	OutputMessage = "output_message"
 )
 
 //go:embed template/*

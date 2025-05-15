@@ -18,10 +18,10 @@ const (
 )
 
 var (
-	mode     string
-	diffFile string
-
+	mode         string
+	diffFile     string
 	maxInputSize int
+	outputLang   string
 )
 
 func init() {
@@ -31,6 +31,7 @@ func init() {
 	reviewCmd.PersistentFlags().StringVar(&mode, "mode", ModeLocal, "mode of fetch git diff information (local or external)")
 	reviewCmd.PersistentFlags().StringVar(&diffFile, "diff_file", "", "path of the diff file to be reviewed")
 	reviewCmd.PersistentFlags().IntVar(&maxInputSize, "max_input_size", 20*1024*1024, "maximum git diff input size(default: 20MB, units: bytes)")
+	reviewCmd.PersistentFlags().StringVar(&outputLang, "output_lang", "en", "output language of the review summary(default: English)")
 }
 
 // reviewCmd represents the "review" command which automates the process of
@@ -101,6 +102,27 @@ var reviewCmd = &cobra.Command{
 		}
 		summary := resp.Text
 		color.Magenta(resp.TokenUsage.String())
+
+		lang := prompt.GetLanguage(ServerOption.GitOptions.Lang)
+		if lang != prompt.DefaultLanguage {
+			// get translation prompt
+			instruction, err := prompt.GetPromptTmpl(prompt.TranslationTmpl, map[string]any{
+				prompt.OutputLang:    ServerOption.GitOptions.Lang,
+				prompt.OutputMessage: resp.Text,
+			})
+			if err != nil {
+				return err
+			}
+
+			// translate the summary to the specified language
+			color.Cyan("We are trying to translate the code review summary to " + lang)
+			resp, err := client.ChatCompletion(cmd.Context(), instruction)
+			if err != nil {
+				return err
+			}
+			summary = resp.Text
+			color.Magenta(resp.TokenUsage.String())
+		}
 
 		// Output core review summary
 		color.Yellow("================Review Summary====================")

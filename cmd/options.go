@@ -96,19 +96,23 @@ func (s *ServerOptions) applyCfg() error {
 	}
 
 	if diffUnifiedLines != 3 {
-		viper.Set("git.diff_unified", diffUnifiedLines)
+		s.GitOptions.DiffUnified = diffUnifiedLines
 	}
 
 	if len(excludedList) > 0 {
-		viper.Set("git.exclude_list", excludedList)
+		s.GitOptions.ExcludedList = append(s.GitOptions.ExcludedList, excludedList...)
 	}
 
 	if diffFile != "" {
-		viper.Set("git.diff_file", diffFile)
+		s.GitOptions.DiffFile = diffFile
 	}
 
 	if maxInputSize != 20*1024*1024 {
-		viper.Set("git.max_input_size", maxInputSize)
+		s.GitOptions.MaxInputSize = maxInputSize
+	}
+
+	if outputLang != "en" {
+		s.GitOptions.Lang = outputLang
 	}
 
 	return nil
@@ -120,6 +124,7 @@ type GitOptions struct {
 	DiffUnified  int      `mapstructure:"diff_unified"`
 	ExcludedList []string `mapstructure:"exclude_list"`
 	Amend        bool     `mapstructure:"amend"`
+	Lang         string   `mapstructure:"lang"`
 }
 
 func NewGitOptions() *GitOptions {
@@ -128,6 +133,7 @@ func NewGitOptions() *GitOptions {
 		DiffUnified:  3,
 		ExcludedList: []string{},
 		Amend:        false,
+		Lang:         "en",
 	}
 }
 
