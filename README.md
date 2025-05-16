@@ -47,6 +47,7 @@ make build
 - 支持选择让git diff忽略的文件
 - 支持proxy配置
 - 支持替换base_url
+- 支持请求大模型的超时配置
 
 ## 使用方法
 ### 配置方法
@@ -59,20 +60,22 @@ make build
 git add .
 reviewbot commit
 ```
+![commit](./images/commit.gif)
   
 ### 进行code review
 ```sh
 git add .
 reviewbot review
 ```
+![review](./images/review.gif)
 
 ### 列出可选配置
 ```sh
 reviewbot config list
 ```
 可选配置如下:  
-
 ![config_list](./images/config_list.png)
+![review_config_list](./images/review_config_list.gif)
 
 
 ### 更新配置
@@ -81,19 +84,20 @@ reviewbot config set ai.api_key xxxxxx
 ```
 更新成功输出类似下面：
 ![config_set](./images/config_set.png)
-
+![review_config_set](./images/review_config_set.gif)
 ### 流式输出（review命令支持）
 指定 --stream=true
 ```sh
 reviewbot review --stream=true
 ```
-
+![review_stream](./images/review_stream.gif)
 ### 指定语言翻译（review命令支持）
 指定 --output_lang=lang，支持（en、zh-cn、zh-tw、jp）  
 
 ```sh
 reviewbot review --output_lang=zh-cn
 ```
+![review_translation](./images/review_translation.gif)
 ### 从外部源获取git diff
 指定 --mode=external  
 
@@ -102,13 +106,16 @@ reviewbot review --output_lang=zh-cn
 git add .
 git diff --staged | reviewbot review --mode=external
 ```
+![review_external_pipe](./images/review_external_pipe.gif)
 - 文件
 ```sh
 git add .
 git diff --staged > git_diff.txt
 reviewbot review --mode=external --diff_file=git_diff.txt
 ```
+![review_external_file](./images/review_external_file.gif)
 - 命令行参数
 ```sh
 reviewbot review --mode=external your_git_diff_content
 ```
+![review_external_args](./images/review_external_args.gif)
