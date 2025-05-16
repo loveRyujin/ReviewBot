@@ -1,5 +1,5 @@
 ## 安装方式
-可以从[Release](https://github.com/loveRyujin/ReviewBot/Release)下载预编译的二进制文件，将其放置路径加入环境变量。
+可以从[Release](https://github.com/loveRyujin/ReviewBot/releases)下载预编译的二进制文件，将其放置路径加入环境变量。
 执行以下命令：
 ```sh
 reviewbot
@@ -119,3 +119,6 @@ reviewbot review --mode=external --diff_file=git_diff.txt
 reviewbot review --mode=external your_git_diff_content
 ```
 ![review_external_args](./images/review_external_args.gif)
+
+## 其它
+目前支持访问openai和deepseek。国内因为某种原因无法直接访问openai的服务，可以参考该项目config目录下的reviewbot.yaml在对应路径进行配置，访问deepseek的服务，或者自己配置proxy.proxy_url。
