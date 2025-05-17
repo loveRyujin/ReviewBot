@@ -2,7 +2,7 @@ ai:
     api_key: xxxxxx
     base_url: https://api.deepseek.com/v1
     model: deepseek-chat
-    provider: openai
+    provider: deepseek
 git:
     amend: false
     diff_unified: 3

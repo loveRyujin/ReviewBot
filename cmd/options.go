@@ -76,6 +76,17 @@ func (s *ServerOptions) OpenaiConfig() *openai.Config {
 	}
 }
 
+func (s *ServerOptions) DeepSeekConfig() *openai.Config {
+	return &openai.Config{
+		BaseURL:     s.AiOptions.BaseURL,
+		ApiKey:      s.AiOptions.ApiKey,
+		Model:       s.AiOptions.Model,
+		MaxTokens:   s.AiOptions.MaxTokens,
+		Temperature: s.AiOptions.Temperature,
+		TopP:        s.AiOptions.TopP,
+	}
+}
+
 func (s *ServerOptions) ProxyConfig() *proxy.Config {
 	return &proxy.Config{
 		ProxyURL:   s.ProxyOptions.ProxyURL,

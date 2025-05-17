@@ -12,6 +12,11 @@ func NewOpenAIClient() (*openai.Client, error) {
 	return ServerOption.OpenaiConfig().New(proxyCfg)
 }
 
+func NewDeepSeekClient() (*openai.Client, error) {
+	proxyCfg := ServerOption.ProxyConfig()
+	return ServerOption.DeepSeekConfig().New(proxyCfg)
+}
+
 func GetModelClient(provider ai.Provider) (ai.TextGenerator, error) {
 	switch provider {
 	case ai.OpenAI:
@@ -19,7 +24,7 @@ func GetModelClient(provider ai.Provider) (ai.TextGenerator, error) {
 	case ai.Anthropic:
 		return nil, nil
 	case ai.DeepSeek:
-		return nil, nil
+		return NewDeepSeekClient()
 	default:
 		return nil, errors.New("unsupported LLM provider")
 	}
