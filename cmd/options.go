@@ -6,7 +6,7 @@ import (
 
 	"github.com/loveRyujin/ReviewBot/git"
 	"github.com/loveRyujin/ReviewBot/llm/openai"
-	"github.com/loveRyujin/ReviewBot/pkg"
+	"github.com/loveRyujin/ReviewBot/pkg/command"
 	"github.com/loveRyujin/ReviewBot/proxy"
 	"github.com/spf13/viper"
 )
@@ -102,7 +102,7 @@ func (s *ServerOptions) ProxyConfig() *proxy.Config {
 // configuration settings such as the number of unified lines for diffs
 // and the list of excluded items.
 func (s *ServerOptions) applyCfg() error {
-	if !pkg.IsCommandAvailable("git") {
+	if !command.IsCommandAvailable("git") {
 		return errors.New("git command not found in your system PATH, Please install git")
 	}
 

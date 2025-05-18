@@ -6,6 +6,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/loveRyujin/ReviewBot/pkg/version"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -25,6 +26,9 @@ var rootCmd = &cobra.Command{
 	Use:          "reviewbot",
 	Short:        "help code review when merging code",
 	SilenceUsage: true,
+	Run: func(cmd *cobra.Command, args []string) {
+		version.PrintAndExitIfRequested()
+	},
 }
 
 func init() {
@@ -34,6 +38,8 @@ func init() {
 	rootCmd.AddCommand(commitCmd)
 
 	rootCmd.PersistentFlags().StringVarP(&configPath, "config", "c", "", "config file path")
+
+	version.AddFlags(rootCmd.Flags())
 
 	rootCmd.CompletionOptions.HiddenDefaultCmd = true
 
