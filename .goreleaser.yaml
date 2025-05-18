@@ -60,6 +60,7 @@ archives:
 changelog:
   use: github
   sort: asc
+  format: "{{.SHA}}: {{.Message}} (@{{.AuthorUsername}})"
   groups:
     - title: Features
       regexp: "^.*feat[(\\w)]*:+.*$"
