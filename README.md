@@ -55,6 +55,15 @@ make build
 - 环境变量（以REVIEWBOT为前缀，_进行拼接，如REVIEWBOT_AI_BASE_URL,对应ai.base_url这个配置项）
 - yaml配置文件（会从三个地方读取配置：~/.config/reviwebot/reviewbot.yaml、项目根目录、根目录下的config目录，优先级按照顺序从低到高）
 
+### 查看版本
+展示语义化版本：
+```sh
+reviewbot --version
+```
+展示详细版本信息：
+```sh
+reviewbot --version=raw
+```
 ### 生成git commit message
 ```sh
 git add .
