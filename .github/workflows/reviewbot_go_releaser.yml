@@ -34,4 +34,4 @@ jobs:
         args: release --clean
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        GO_VERSION: ${{ steps.setup-go.outputs.go-version }}
+        GIT_TREE_STATE: ${{ env.GIT_TREE_STATE }}
