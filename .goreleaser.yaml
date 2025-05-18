@@ -12,6 +12,10 @@ before:
   hooks:
     # You may remove this if you don't use go modules.
     - go mod tidy
+    # 检查 Git 仓库状态是否为 clean/dirty
+    - git fetch --tags -f
+    # 使用 GitHub Actions 的机制导出环境变量
+    - sh -c 'if [ -z "$(git status --porcelain)" ]; then echo "GIT_TREE_STATE=clean" >> $GITHUB_ENV; else echo "GIT_TREE_STATE=dirty" >> $GITHUB_ENV; fi'
 
 builds:
   - env:
@@ -20,7 +24,22 @@ builds:
       - linux
       - windows
       - darwin
+    goarch:
+      - amd64
+      - arm64
+    goarm:
+      - 7
+    flags:
+      - -trimpath
+    ldflags:
+      # 使用 GoReleaser 的内置变量 + 自定义环境变量
+      - -s -w
+      - -X 'github.com/loveRyujin/ReviewBot/pkg/version.gitVersion={{ .Version }}''
+      - -X 'github.com/loveRyujin/ReviewBot/pkg/version.gitCommit={{ .Commit }}'
+      - -X 'github.com/loveRyujin/ReviewBot/pkg/version.gitTreeState={{ .Env.GIT_TREE_STATE }}''
+      - -X 'github.com/loveRyujin/ReviewBot/pkg/version.buildDate={{ .Date }}'
     main: ./cmd/reviewbot
+    binary: reviewbot
 
 archives:
   - formats: [tar.gz]
@@ -38,11 +57,29 @@ archives:
         formats: [zip]
 
 changelog:
+  use: github
   sort: asc
-  filters:
-    exclude:
-      - "^docs:"
-      - "^test:"
+  groups:
+    - title: Features
+      regexp: "^.*feat[(\\w)]*:+.*$"
+      order: 0
+    - title: "Bug fixes"
+      regexp: "^.*fix[(\\w)]*:+.*$"
+      order: 1
+    - title: "Enhancements"
+      regexp: "^.*chore[(\\w)]*:+.*$"
+      order: 2
+    - title: "Refactor"
+      regexp: "^.*refactor[(\\w)]*:+.*$"
+      order: 3
+    - title: "Build process updates"
+      regexp: ^.*?(build|ci)(\(.+\))??!?:.+$
+      order: 4
+    - title: "Documentation updates"
+      regexp: ^.*?docs?(\(.+\))??!?:.+$
+      order: 4
+    - title: Others
+      order: 999
 
 release:
   footer: >-
