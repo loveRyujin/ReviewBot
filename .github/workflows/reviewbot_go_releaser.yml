@@ -24,7 +24,7 @@ jobs:
       uses: actions/setup-go@v5
       with:
         go-version-file: go.mod
-        check_latest: true
+        check-latest: true
     
     - name: Set GIT_TREE_STATE
       run: |
