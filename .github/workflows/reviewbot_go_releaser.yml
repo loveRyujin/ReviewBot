@@ -25,6 +25,14 @@ jobs:
       with:
         go-version-file: go.mod
         check_latest: true
+    
+    - name: Set GIT_TREE_STATE
+      run: |
+        if [ -z "$(git status --porcelain)" ]; then
+        echo "GIT_TREE_STATE=clean" >> $GITHUB_ENV
+        else
+        echo "GIT_TREE_STATE=dirty" >> $GITHUB_ENV
+        fi 
 
     - name: Run goreleaser
       uses: goreleaser/goreleaser-action@v6

@@ -12,10 +12,6 @@ before:
   hooks:
     # You may remove this if you don't use go modules.
     - go mod tidy
-    # 检查 Git 仓库状态是否为 clean/dirty
-    - git fetch --tags -f
-    # 使用 GitHub Actions 的机制导出环境变量
-    - sh -c 'if [ -z "$(git status --porcelain)" ]; then echo "GIT_TREE_STATE=clean" >> $GITHUB_ENV; else echo "GIT_TREE_STATE=dirty" >> $GITHUB_ENV; fi'
 
 builds:
   - env:
