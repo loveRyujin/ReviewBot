@@ -26,6 +26,7 @@ builds:
       - darwin
     goarch:
       - amd64
+      - arm
       - arm64
     goarm:
       - 7
@@ -34,9 +35,9 @@ builds:
     ldflags:
       # 使用 GoReleaser 的内置变量 + 自定义环境变量
       - -s -w
-      - -X 'github.com/loveRyujin/ReviewBot/pkg/version.gitVersion={{ .Version }}''
+      - -X 'github.com/loveRyujin/ReviewBot/pkg/version.gitVersion={{ .Version }}'
       - -X 'github.com/loveRyujin/ReviewBot/pkg/version.gitCommit={{ .Commit }}'
-      - -X 'github.com/loveRyujin/ReviewBot/pkg/version.gitTreeState={{ .Env.GIT_TREE_STATE }}''
+      - -X 'github.com/loveRyujin/ReviewBot/pkg/version.gitTreeState={{ .Env.GIT_TREE_STATE }}'
       - -X 'github.com/loveRyujin/ReviewBot/pkg/version.buildDate={{ .Date }}'
     main: ./cmd/reviewbot
     binary: reviewbot
