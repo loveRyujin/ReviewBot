@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	"github.com/loveRyujin/ReviewBot/ai"
+	"github.com/loveRyujin/ReviewBot/llm/gemini"
 	"github.com/loveRyujin/ReviewBot/llm/openai"
 )
 
@@ -17,6 +18,10 @@ func NewDeepSeekClient() (*openai.Client, error) {
 	return ServerOption.DeepSeekConfig().New(proxyCfg)
 }
 
+func NewGeminiClient() (*gemini.Client, error) {
+	return ServerOption.GeminiConfig().New()
+}
+
 func GetModelClient(provider ai.Provider) (ai.TextGenerator, error) {
 	switch provider {
 	case ai.OpenAI:
@@ -25,6 +30,8 @@ func GetModelClient(provider ai.Provider) (ai.TextGenerator, error) {
 		return nil, nil
 	case ai.DeepSeek:
 		return NewDeepSeekClient()
+	case ai.Gemini:
+		return nil, nil
 	default:
 		return nil, errors.New("unsupported LLM provider")
 	}

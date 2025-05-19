@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/loveRyujin/ReviewBot/git"
+	"github.com/loveRyujin/ReviewBot/llm/gemini"
 	"github.com/loveRyujin/ReviewBot/llm/openai"
 	"github.com/loveRyujin/ReviewBot/pkg/command"
 	"github.com/loveRyujin/ReviewBot/proxy"
@@ -80,6 +81,19 @@ func (s *ServerOptions) OpenaiConfig() *openai.Config {
 
 func (s *ServerOptions) DeepSeekConfig() *openai.Config {
 	return &openai.Config{
+		BaseURL:          s.AiOptions.BaseURL,
+		ApiKey:           s.AiOptions.ApiKey,
+		Model:            s.AiOptions.Model,
+		MaxTokens:        s.AiOptions.MaxTokens,
+		Temperature:      s.AiOptions.Temperature,
+		TopP:             s.AiOptions.TopP,
+		PresencePenalty:  s.AiOptions.PresencePenalty,
+		FrequencyPenalty: s.AiOptions.FrequencyPenalty,
+	}
+}
+
+func (s *ServerOptions) GeminiConfig() *gemini.Config {
+	return &gemini.Config{
 		BaseURL:          s.AiOptions.BaseURL,
 		ApiKey:           s.AiOptions.ApiKey,
 		Model:            s.AiOptions.Model,
