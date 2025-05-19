@@ -11,11 +11,13 @@ import (
 var _ ai.TextGenerator = (*Client)(nil)
 
 type Client struct {
-	client      *openai.Client
-	model       string
-	maxTokens   int
-	temperature float32
-	topP        float32
+	client           *openai.Client
+	model            string
+	maxTokens        int
+	temperature      float32
+	topP             float32
+	PresencePenalty  float32
+	FrequencyPenalty float32
 }
 
 type Response struct {
@@ -42,10 +44,12 @@ func (c *Client) ChatCompletion(ctx context.Context, text string) (*ai.Response,
 
 func (c *Client) chatCompletion(ctx context.Context, text string) (*Response, error) {
 	req := openai.ChatCompletionRequest{
-		Model:       c.model,
-		MaxTokens:   c.maxTokens,
-		Temperature: c.temperature,
-		TopP:        c.topP,
+		Model:            c.model,
+		MaxTokens:        c.maxTokens,
+		Temperature:      c.temperature,
+		TopP:             c.topP,
+		PresencePenalty:  c.PresencePenalty,
+		FrequencyPenalty: c.FrequencyPenalty,
 		Messages: []openai.ChatCompletionMessage{
 			{
 				Role:    openai.ChatMessageRoleAssistant,
@@ -72,10 +76,12 @@ func (c *Client) chatCompletion(ctx context.Context, text string) (*Response, er
 // StreamChatCompletion streams the chat completion response.
 func (c *Client) StreamChatCompletion(ctx context.Context, text string) (*openai.ChatCompletionStream, error) {
 	req := openai.ChatCompletionRequest{
-		Model:       c.model,
-		MaxTokens:   c.maxTokens,
-		Temperature: c.temperature,
-		TopP:        c.topP,
+		Model:            c.model,
+		MaxTokens:        c.maxTokens,
+		Temperature:      c.temperature,
+		TopP:             c.topP,
+		PresencePenalty:  c.PresencePenalty,
+		FrequencyPenalty: c.FrequencyPenalty,
 		Messages: []openai.ChatCompletionMessage{
 			{
 				Role:    openai.ChatMessageRoleAssistant,
@@ -117,10 +123,12 @@ func (cfg *Config) New(proxyCfg *proxy.Config) (*Client, error) {
 
 	client := openai.NewClientWithConfig(c)
 	return &Client{
-		client:      client,
-		model:       cfg.Model,
-		maxTokens:   cfg.MaxTokens,
-		temperature: cfg.Temperature,
-		topP:        cfg.TopP,
+		client:           client,
+		model:            cfg.Model,
+		maxTokens:        cfg.MaxTokens,
+		temperature:      cfg.Temperature,
+		topP:             cfg.TopP,
+		PresencePenalty:  cfg.PresencePenalty,
+		FrequencyPenalty: cfg.FrequencyPenalty,
 	}, nil
 }

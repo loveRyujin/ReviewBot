@@ -67,23 +67,27 @@ func (s *ServerOptions) GitConfig() *git.Config {
 
 func (s *ServerOptions) OpenaiConfig() *openai.Config {
 	return &openai.Config{
-		BaseURL:     s.AiOptions.BaseURL,
-		ApiKey:      s.AiOptions.ApiKey,
-		Model:       s.AiOptions.Model,
-		MaxTokens:   s.AiOptions.MaxTokens,
-		Temperature: s.AiOptions.Temperature,
-		TopP:        s.AiOptions.TopP,
+		BaseURL:          s.AiOptions.BaseURL,
+		ApiKey:           s.AiOptions.ApiKey,
+		Model:            s.AiOptions.Model,
+		MaxTokens:        s.AiOptions.MaxTokens,
+		Temperature:      s.AiOptions.Temperature,
+		TopP:             s.AiOptions.TopP,
+		PresencePenalty:  s.AiOptions.PresencePenalty,
+		FrequencyPenalty: s.AiOptions.FrequencyPenalty,
 	}
 }
 
 func (s *ServerOptions) DeepSeekConfig() *openai.Config {
 	return &openai.Config{
-		BaseURL:     s.AiOptions.BaseURL,
-		ApiKey:      s.AiOptions.ApiKey,
-		Model:       s.AiOptions.Model,
-		MaxTokens:   s.AiOptions.MaxTokens,
-		Temperature: s.AiOptions.Temperature,
-		TopP:        s.AiOptions.TopP,
+		BaseURL:          s.AiOptions.BaseURL,
+		ApiKey:           s.AiOptions.ApiKey,
+		Model:            s.AiOptions.Model,
+		MaxTokens:        s.AiOptions.MaxTokens,
+		Temperature:      s.AiOptions.Temperature,
+		TopP:             s.AiOptions.TopP,
+		PresencePenalty:  s.AiOptions.PresencePenalty,
+		FrequencyPenalty: s.AiOptions.FrequencyPenalty,
 	}
 }
 
@@ -174,12 +178,14 @@ type AiOptions struct {
 
 func NewAiOptions() *AiOptions {
 	return &AiOptions{
-		Provider:    "openai",
-		ApiKey:      "xxxxxx",
-		Model:       "gpt-3.5-turbo",
-		MaxTokens:   1000,
-		Temperature: 0.7,
-		TopP:        1.0,
+		Provider:         "openai",
+		ApiKey:           "xxxxxx",
+		Model:            "gpt-3.5-turbo",
+		MaxTokens:        1000,
+		Temperature:      0.7,
+		TopP:             1.0,
+		PresencePenalty:  0.5,
+		FrequencyPenalty: 0.5,
 	}
 }
 
