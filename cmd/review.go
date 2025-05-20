@@ -148,36 +148,15 @@ func executeReview(ctx context.Context, client ai.TextGenerator, reviewPrompt st
 
 // streamOutput streams AI-generated review output in real-time with colored formatting and token usage stats.
 func streamOutput(ctx context.Context, client ai.TextGenerator, reviewPrompt string, colorF func(format string, a ...interface{})) error {
-	stream, err := client.StreamChatCompletion(ctx, reviewPrompt)
-	if err != nil {
+	chunkHandler := func(chunk string) error {
+		colorF(chunk)
+		return nil
+	}
+
+	if err := client.StreamChatCompletion(ctx, reviewPrompt, chunkHandler); err != nil {
 		return err
 	}
-	defer stream.Close()
 
-	color.Yellow("================Review Summary====================" + "\n\n")
-
-	tokenUsage := ai.TokenUsage{}
-	for {
-		resp, err := stream.Recv()
-		if err != nil {
-			if errors.Is(err, io.EOF) {
-				color.Yellow("\n" + "==================================================")
-				break
-			}
-			return err
-		}
-
-		colorF("%s", resp.Choices[0].Delta.Content)
-
-		if resp.Usage != nil {
-			tokenUsage.PromptTokens = resp.Usage.PromptTokens
-			tokenUsage.CompletionTokens = resp.Usage.CompletionTokens
-			tokenUsage.TotalTokens = resp.Usage.TotalTokens
-			tokenUsage.PromptTokensDetails = resp.Usage.PromptTokensDetails
-			tokenUsage.CompletionTokensDetails = resp.Usage.CompletionTokensDetails
-		}
-	}
-	color.Magenta(tokenUsage.String())
 	return nil
 }
 

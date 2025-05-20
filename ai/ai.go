@@ -7,6 +7,8 @@ import (
 	"github.com/sashabaranov/go-openai"
 )
 
+type ChunkHandler func(chunk string) error
+
 type TokenUsage struct {
 	PromptTokens            int
 	CompletionTokens        int
@@ -35,5 +37,5 @@ type Response struct {
 
 type TextGenerator interface {
 	ChatCompletion(ctx context.Context, text string) (*Response, error)
-	StreamChatCompletion(ctx context.Context, text string) (*openai.ChatCompletionStream, error)
+	StreamChatCompletion(ctx context.Context, text string, handler ChunkHandler) error
 }
