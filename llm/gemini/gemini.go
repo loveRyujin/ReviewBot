@@ -90,6 +90,7 @@ func (c *Client) StreamChatCompletion(ctx context.Context, text string, handler 
 }
 
 type Config struct {
+	BaseURL     string
 	ApiKey      string
 	Model       string
 	MaxTokens   int
@@ -99,10 +100,16 @@ type Config struct {
 
 func (cfg *Config) New(proxyCfg *proxy.Config) (*Client, error) {
 	httpClient, _ := proxyCfg.New()
+	httpOption := genai.HTTPOptions{}
+	if cfg.BaseURL != "" {
+		httpOption.BaseURL = cfg.BaseURL
+	}
+
 	client, err := genai.NewClient(context.Background(), &genai.ClientConfig{
-		HTTPClient: httpClient,
-		APIKey:     cfg.ApiKey,
-		Backend:    genai.BackendGeminiAPI,
+		HTTPClient:  httpClient,
+		HTTPOptions: httpOption,
+		APIKey:      cfg.ApiKey,
+		Backend:     genai.BackendGeminiAPI,
 	})
 	if err != nil {
 		return nil, err

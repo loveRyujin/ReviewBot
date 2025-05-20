@@ -94,6 +94,7 @@ func (s *ServerOptions) DeepSeekConfig() *openai.Config {
 
 func (s *ServerOptions) GeminiConfig() *gemini.Config {
 	return &gemini.Config{
+		BaseURL:     s.AiOptions.BaseURL,
 		ApiKey:      s.AiOptions.ApiKey,
 		Model:       s.AiOptions.Model,
 		MaxTokens:   s.AiOptions.MaxTokens,
