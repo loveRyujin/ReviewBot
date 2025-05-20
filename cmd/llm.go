@@ -19,7 +19,8 @@ func NewDeepSeekClient() (*openai.Client, error) {
 }
 
 func NewGeminiClient() (*gemini.Client, error) {
-	return ServerOption.GeminiConfig().New()
+	proxyCfg := ServerOption.ProxyConfig()
+	return ServerOption.GeminiConfig().New(proxyCfg)
 }
 
 func GetModelClient(provider ai.Provider) (ai.TextGenerator, error) {

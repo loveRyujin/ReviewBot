@@ -7,6 +7,7 @@ import (
 
 	"github.com/fatih/color"
 	"github.com/loveRyujin/ReviewBot/ai"
+	"github.com/loveRyujin/ReviewBot/proxy"
 	"github.com/sashabaranov/go-openai"
 	"google.golang.org/genai"
 )
@@ -96,10 +97,12 @@ type Config struct {
 	TopP        float32
 }
 
-func (cfg *Config) New() (*Client, error) {
+func (cfg *Config) New(proxyCfg *proxy.Config) (*Client, error) {
+	httpClient, _ := proxyCfg.New()
 	client, err := genai.NewClient(context.Background(), &genai.ClientConfig{
-		APIKey:  cfg.ApiKey,
-		Backend: genai.BackendGeminiAPI,
+		HTTPClient: httpClient,
+		APIKey:     cfg.ApiKey,
+		Backend:    genai.BackendGeminiAPI,
 	})
 	if err != nil {
 		return nil, err
