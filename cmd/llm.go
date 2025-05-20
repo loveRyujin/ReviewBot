@@ -31,7 +31,7 @@ func GetModelClient(provider ai.Provider) (ai.TextGenerator, error) {
 	case ai.DeepSeek:
 		return NewDeepSeekClient()
 	case ai.Gemini:
-		return nil, nil
+		return NewGeminiClient()
 	default:
 		return nil, errors.New("unsupported LLM provider")
 	}
