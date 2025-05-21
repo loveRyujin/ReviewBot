@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/loveRyujin/ReviewBot/git"
+	"github.com/loveRyujin/ReviewBot/llm/anthropic"
 	"github.com/loveRyujin/ReviewBot/llm/gemini"
 	"github.com/loveRyujin/ReviewBot/llm/openai"
 	"github.com/loveRyujin/ReviewBot/pkg/command"
@@ -76,6 +77,17 @@ func (s *ServerOptions) OpenaiConfig() *openai.Config {
 		TopP:             s.AiOptions.TopP,
 		PresencePenalty:  s.AiOptions.PresencePenalty,
 		FrequencyPenalty: s.AiOptions.FrequencyPenalty,
+	}
+}
+
+func (s *ServerOptions) AnthropicConfig() *anthropic.Config {
+	return &anthropic.Config{
+		BaseURL:     s.AiOptions.BaseURL,
+		ApiKey:      s.AiOptions.ApiKey,
+		Model:       s.AiOptions.Model,
+		MaxTokens:   s.AiOptions.MaxTokens,
+		Temperature: s.AiOptions.Temperature,
+		TopP:        s.AiOptions.TopP,
 	}
 }
 

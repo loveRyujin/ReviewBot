@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	"github.com/loveRyujin/ReviewBot/ai"
+	"github.com/loveRyujin/ReviewBot/llm/anthropic"
 	"github.com/loveRyujin/ReviewBot/llm/gemini"
 	"github.com/loveRyujin/ReviewBot/llm/openai"
 )
@@ -11,6 +12,11 @@ import (
 func NewOpenAIClient() (*openai.Client, error) {
 	proxyCfg := ServerOption.ProxyConfig()
 	return ServerOption.OpenaiConfig().New(proxyCfg)
+}
+
+func NewAnthropicClient() (*anthropic.Client, error) {
+	proxyCfg := ServerOption.ProxyConfig()
+	return ServerOption.AnthropicConfig().New(proxyCfg)
 }
 
 func NewDeepSeekClient() (*openai.Client, error) {
@@ -28,7 +34,7 @@ func GetModelClient(provider ai.Provider) (ai.TextGenerator, error) {
 	case ai.OpenAI:
 		return NewOpenAIClient()
 	case ai.Anthropic:
-		return nil, nil
+		return NewAnthropicClient()
 	case ai.DeepSeek:
 		return NewDeepSeekClient()
 	case ai.Gemini:

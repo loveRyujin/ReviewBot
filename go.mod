@@ -5,6 +5,7 @@ go 1.24.0
 require (
 	github.com/fatih/color v1.18.0
 	github.com/gosuri/uitable v0.0.4
+	github.com/liushuangls/go-anthropic/v2 v2.15.0
 	github.com/rodaine/table v1.3.0
 	github.com/sashabaranov/go-openai v1.38.1
 	github.com/spf13/cobra v1.9.1
