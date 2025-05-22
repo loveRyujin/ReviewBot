@@ -136,4 +136,48 @@ reviewbot review --mode=external your_git_diff_content
 ![review_external_args](./images/review_external_args.gif)
 
 ## 其它
-目前支持访问openai和deepseek。国内因为某种原因无法直接访问openai的服务，可以参考该项目config目录下的reviewbot.yaml在对应路径进行配置，访问deepseek的服务，或者自己配置proxy.proxy_url。
+目前支持访问openai、deepseek、google gemini、anthropic claude等服务。国内因为某种原因无法直接访问外网的服务，可以参考该项目config目录下的reviewbot.yaml在对应路径进行配置，访问deepseek的服务，或者自己配置proxy.proxy_url、ai.base_url。
+
+### openai
+```sh
+reviewbot config set ai.provider openai
+reviewbot config set ai.api_key xxxxxx
+reviewbot config set ai.model "model_name"
+
+# 可以配置ai.base_url访问openai模型服务
+# openai 文档详情 https://platform.openai.com/docs/overview
+```
+
+### google gemini
+```sh
+reviewbot config set ai.provider gemini
+reviewbot config set ai.api_key xxxxxx
+reviewbot config set ai.model "model_name"
+
+# 可以配置ai.base_url访问gemini模型服务
+# google gemini 文档详情 https://ai.google.dev/gemini-api/docs?hl=zh-cn
+```
+
+### deepseek
+```sh
+reviewbot config set ai.provider deepseek
+reviewbot config set ai.api_key xxxxx
+reviewbot config set ai.model "model_name"
+reviewbot config set ai.base_url https://api.deepseek.com/v1
+
+# deepseek 文档详情 https://api-docs.deepseek.com/zh-cn/
+```
+
+### anthropic claude
+```sh
+reviewbot config set ai.provider anthropic 
+reviewbot config set ai.api_key xxxxxx
+reviewbot config set ai.model "model_name"
+
+# 可以配置ai.base_url访问claude模型服务
+# anthropic 文档详情 https://docs.anthropic.com/en/home
+```
+
+
+
+
