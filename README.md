@@ -1,3 +1,9 @@
+# ReviewBot
+
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/loveRyujin/ReviewBot)
+
+一个人工智能驱动的命令行工具，根据git存储库里的变更帮助开发人员生成git commit message、执行code review等。
+
 ## 安装方式
 可以从[Release](https://github.com/loveRyujin/ReviewBot/releases)下载预编译的二进制文件，将其放置路径加入环境变量。
 执行以下命令：
