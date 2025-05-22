@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"embed"
 	"html/template"
-	"path/filepath"
+	"path"
 )
 
 const (
@@ -36,7 +36,7 @@ func GetPromptTmpl(file string, data map[string]any) (string, error) {
 }
 
 func processTmpl(file string, data map[string]any) (*bytes.Buffer, error) {
-	output, err := templateFS.ReadFile(filepath.Join("template", file))
+	output, err := templateFS.ReadFile(path.Join("template", file))
 	if err != nil {
 		return nil, err
 	}
