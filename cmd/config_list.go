@@ -45,6 +45,9 @@ var availableKeys = map[string]string{
 var configListCmd = &cobra.Command{
 	Use:   "list",
 	Short: "List all configuration settings",
+	PreRun: func(cmd *cobra.Command, args []string) {
+		initConfig()
+	},
 	Run: func(cmd *cobra.Command, args []string) {
 		headerFmt := color.New(color.FgGreen, color.Underline).SprintfFunc()
 		columnFmt := color.New(color.FgYellow).SprintfFunc()

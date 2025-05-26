@@ -24,6 +24,9 @@ func init() {
 var commitCmd = &cobra.Command{
 	Use:   "commit",
 	Short: "Automically generate commit message",
+	PreRun: func(cmd *cobra.Command, args []string) {
+		initConfig()
+	},
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if err := ServerOption.Initialize(); err != nil {
 			return err
