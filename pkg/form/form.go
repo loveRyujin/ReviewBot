@@ -98,7 +98,7 @@ func (m *Model) ApiKey() string {
 	return m.apiKey.Value()
 }
 
-func (m *Model) ModelName() string {
+func (m *Model) Model() string {
 	return m.model.Value()
 }
 
@@ -119,7 +119,12 @@ func (m *Model) DiffUnified() string {
 }
 
 func (m *Model) ExcludedList() []string {
-	return strings.Split(m.excludedList.Value(), ",")
+	excludedList := m.excludedList.Value()
+	if excludedList == "" {
+		return make([]string, 0)
+	}
+
+	return strings.Split(excludedList, ",")
 }
 
 func (m *Model) Amend() string {
@@ -143,7 +148,12 @@ func (m *Model) Timeout() string {
 }
 
 func (m *Model) Headers() []string {
-	return strings.Split(m.headers.Value(), ",")
+	headers := m.headers.Value()
+	if headers == "" {
+		return make([]string, 0)
+	}
+
+	return strings.Split(headers, ",")
 }
 
 func (m *Model) SkipVerify() string {
