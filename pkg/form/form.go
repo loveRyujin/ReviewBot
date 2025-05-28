@@ -2,6 +2,7 @@ package form
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
@@ -117,8 +118,8 @@ func (m *Model) DiffUnified() string {
 	return m.diffUnified.Value()
 }
 
-func (m *Model) ExcludedList() string {
-	return m.excludedList.Value()
+func (m *Model) ExcludedList() []string {
+	return strings.Split(m.excludedList.Value(), ",")
 }
 
 func (m *Model) Amend() string {
@@ -141,8 +142,8 @@ func (m *Model) Timeout() string {
 	return m.timeout.Value()
 }
 
-func (m *Model) Headers() string {
-	return m.headers.Value()
+func (m *Model) Headers() []string {
+	return strings.Split(m.headers.Value(), ",")
 }
 
 func (m *Model) SkipVerify() string {
