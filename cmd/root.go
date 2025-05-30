@@ -26,9 +26,6 @@ var rootCmd = &cobra.Command{
 	Use:          "reviewbot",
 	Short:        "help code review when merging code",
 	SilenceUsage: true,
-	PreRun: func(cmd *cobra.Command, args []string) {
-		initConfig()
-	},
 	Run: func(cmd *cobra.Command, args []string) {
 		version.PrintAndExitIfRequested()
 	},
