@@ -2,7 +2,7 @@
 可以从[Release](https://github.com/loveRyujin/ReviewBot/releases)下载预编译的二进制文件，将其放置路径加入环境变量。
 执行以下命令：
 ```sh
-reviewbot
+reviewbot -h\--help
 ```  
 
 输出以下内容，代表安装成功：
@@ -10,17 +10,20 @@ reviewbot
 help code review when merging code
 
 Usage:
+  reviewbot [flags]
   reviewbot [command]
 
 Available Commands:
   commit      Automically generate commit message
   config      Manage configuration settings
   help        Help about any command
+  init        Initialize ReviewBot configuration
   review      Auto review code changes in git stage
 
 Flags:
-  -c, --config string   config file path
-  -h, --help            help for reviewbot
+  -c, --config string            config file path
+  -h, --help                     help for reviewbot
+      --version version[=true]   Print version information and quit.
 
 Use "reviewbot [command] --help" for more information about a command.
 ```  
@@ -54,6 +57,7 @@ make build
 - 命令行参数（可用 -h | --help 对对应命令的命令行参数进行查看）
 - 环境变量（以REVIEWBOT为前缀，_进行拼接，如REVIEWBOT_AI_BASE_URL,对应ai.base_url这个配置项）
 - yaml配置文件（会从三个地方读取配置：~/.config/reviwebot/reviewbot.yaml、项目根目录、根目录下的config目录，优先级按照顺序从低到高）
+- 执行reviewbot init命令，引导输入配置，并在默认配置路径（~/.config/reviewbot/reviewbot.yaml）生成配置文件，具体使用后文有演示
 
 ### 查看版本
 展示语义化版本：
@@ -64,6 +68,12 @@ reviewbot --version
 ```sh
 reviewbot --version=raw
 ```
+### 初始化配置
+```sh
+reviewbot init
+```
+![init](./images/init.gif)
+
 ### 生成git commit message
 ```sh
 git add .
