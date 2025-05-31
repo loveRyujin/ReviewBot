@@ -41,6 +41,9 @@ func init() {
 var reviewCmd = &cobra.Command{
 	Use:   "review",
 	Short: "Auto review code changes in git stage",
+	PreRun: func(cmd *cobra.Command, args []string) {
+		initConfig()
+	},
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if err := ServerOption.Initialize(); err != nil {
 			return err

@@ -24,6 +24,9 @@ var configSetCmd = &cobra.Command{
 	Use:   "set",
 	Short: "Set configuration value",
 	Args:  cobra.MinimumNArgs(2),
+	PreRun: func(cmd *cobra.Command, args []string) {
+		initConfig()
+	},
 	RunE: func(cmd *cobra.Command, args []string) error {
 		// check if the key is valid
 		if _, exist := availableKeys[args[0]]; !exist {

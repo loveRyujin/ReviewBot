@@ -32,7 +32,7 @@ var rootCmd = &cobra.Command{
 }
 
 func init() {
-	cobra.OnInitialize(initConfig)
+	rootCmd.AddCommand(initCmd)
 	rootCmd.AddCommand(reviewCmd)
 	rootCmd.AddCommand(configCmd)
 	rootCmd.AddCommand(commitCmd)
