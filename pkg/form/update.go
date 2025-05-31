@@ -5,6 +5,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
+// updateAiConfig updates the AI configuration inputs based on user interactions.
 func updateAiConfig(msg tea.Msg, m *Model) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 
@@ -66,6 +67,7 @@ func updateAiConfig(msg tea.Msg, m *Model) (tea.Model, tea.Cmd) {
 	return m, cmd
 }
 
+// updateGitConfig updates the Git configuration inputs based on user interactions.
 func updateGitConfig(msg tea.Msg, m *Model) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 
@@ -131,6 +133,7 @@ func updateGitConfig(msg tea.Msg, m *Model) (tea.Model, tea.Cmd) {
 	return m, cmd
 }
 
+// chooseIfUpdateAiConfig prompts the user to choose whether to update AI configuration.
 func chooseIfUpdateGitConfig(msg tea.Msg, m *Model) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
@@ -163,6 +166,7 @@ func chooseIfUpdateGitConfig(msg tea.Msg, m *Model) (tea.Model, tea.Cmd) {
 	return m, nil
 }
 
+// updateProxyConfig updates the Proxy configuration inputs based on user interactions.
 func updateProxyConfig(msg tea.Msg, m *Model) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 
@@ -223,6 +227,7 @@ func updateProxyConfig(msg tea.Msg, m *Model) (tea.Model, tea.Cmd) {
 	return m, cmd
 }
 
+// chooseIfUpdateProxyConfig prompts the user to choose whether to update Proxy configuration.
 func chooseIfUpdateProxyConfig(msg tea.Msg, m *Model) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:

@@ -2,6 +2,7 @@ package form
 
 import "fmt"
 
+// aiConfigView generates the view for AI configuration input.
 func aiConfigView(m *Model) string {
 	s := "Introduce your AI configuration:\n\n"
 
@@ -12,28 +13,17 @@ func aiConfigView(m *Model) string {
 		m.baseURL.View(),
 	}
 
-	for i := range inputs {
-		s += inputs[i]
-		if i < len(inputs)-1 {
-			s += "\n"
-		}
-	}
-
-	s += "\n"
-
-	return s
+	return s + formatInputsWithNewlines(inputs)
 }
 
+// chooseIfUpdateGitConfigView generates the view for choosing whether to update Git configuration.
 func chooseIfUpdateGitConfigView(m *Model) string {
 	s := "Do you want to update your Git configuration? \n\n"
 
-	for i := range m.choices {
-		s += fmt.Sprintf("%s\n", checkBox(m.choices[i], m.cursor == i))
-	}
-
-	return s
+	return s + formatChoicesWithCheckboxes(m.choices, m.cursor)
 }
 
+// gitConfigView generates the view for Git configuration input.
 func gitConfigView(m *Model) string {
 	s := "Introduce your Git configuration:\n\n"
 
@@ -46,27 +36,17 @@ func gitConfigView(m *Model) string {
 		m.lang.View(),
 	}
 
-	for i := range inputs {
-		s += inputs[i]
-		if i < len(inputs)-1 {
-			s += "\n"
-		}
-	}
-
-	s += "\n"
-
-	return s
+	return s + formatInputsWithNewlines(inputs)
 }
 
+// chooseIfUpdateProxyConfigView generates the view for choosing whether to update Proxy configuration.
 func chooseIfUpdateProxyConfigView(m *Model) string {
 	s := "Do you want to update your Proxy configuration? \n\n"
 
-	for i := range m.choices {
-		s += fmt.Sprintf("%s\n", checkBox(m.choices[i], m.cursor == i))
-	}
-	return s
+	return s + formatChoicesWithCheckboxes(m.choices, m.cursor)
 }
 
+// proxyConfigView generates the view for Proxy configuration input.
 func proxyConfigView(m *Model) string {
 	s := "Introduce your Proxy configuration:\n\n"
 
@@ -78,14 +58,28 @@ func proxyConfigView(m *Model) string {
 		m.skipVerify.View(),
 	}
 
+	return s + formatInputsWithNewlines(inputs)
+}
+
+// formatInputsWithNewlines formats a slice of strings into a single string with each input on a new line.
+func formatInputsWithNewlines(inputs []string) string {
+	s := ""
 	for i := range inputs {
 		s += inputs[i]
 		if i < len(inputs)-1 {
 			s += "\n"
 		}
 	}
-
 	s += "\n"
 
+	return s
+}
+
+// formatChoicesWithCheckboxes formats a slice of choices into a string with checkboxes, highlighting the current cursor position.
+func formatChoicesWithCheckboxes(choices []string, cursor int) string {
+	s := ""
+	for i := range choices {
+		s += fmt.Sprintf("%s\n", checkBox(choices[i], cursor == i))
+	}
 	return s
 }
