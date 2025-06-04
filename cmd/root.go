@@ -80,7 +80,7 @@ func searchDirs() []string {
 	// get user home dir
 	homeDir, err := os.UserHomeDir()
 	cobra.CheckErr(err)
-	return []string{filepath.Join(homeDir, defaultConfigDir), ".", "./config/"}
+	return []string{"./config/", ".", filepath.Join(homeDir, defaultConfigDir)}
 }
 
 func Execute() {
