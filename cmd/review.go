@@ -9,6 +9,7 @@ import (
 
 	"github.com/fatih/color"
 	"github.com/loveRyujin/ReviewBot/ai"
+	"github.com/loveRyujin/ReviewBot/pkg/progress"
 	"github.com/loveRyujin/ReviewBot/prompt"
 	"github.com/spf13/cobra"
 )
@@ -109,10 +110,10 @@ func getDiffContent(args []string) (string, error) {
 
 // executeReview perform code review and process output
 func executeReview(ctx context.Context, client ai.TextGenerator, reviewPrompt string, lang string) error {
-	yellow := color.New(color.FgYellow).PrintfFunc()
-
 	var summary string
 	if stream { // streaming mode
+		yellow := color.New(color.FgYellow).PrintfFunc()
+
 		if lang != prompt.DefaultLanguage {
 			resp, err := client.ChatCompletion(ctx, reviewPrompt)
 			if err != nil {
@@ -126,10 +127,23 @@ func executeReview(ctx context.Context, client ai.TextGenerator, reviewPrompt st
 			return streamOutput(ctx, client, reviewPrompt, yellow)
 		}
 	} else { // non-streaming mode
-		resp, err := client.ChatCompletion(ctx, reviewPrompt)
-		if err != nil {
-			return err
+		var resp *ai.Response
+		var err error
+
+		// Use spinner for AI call in non-streaming mode
+		spinnerErr := progress.WithSpinnerAndCustomMessages(
+			"🤖 Analyzing code changes...",
+			"Code analysis completed",
+			"Failed to analyze code changes",
+			func() error {
+				resp, err = client.ChatCompletion(ctx, reviewPrompt)
+				return err
+			},
+		)
+		if spinnerErr != nil {
+			return spinnerErr
 		}
+
 		summary = resp.Text
 		color.Magenta(resp.TokenUsage.String())
 
@@ -188,10 +202,21 @@ func translateContent(ctx context.Context, client ai.TextGenerator, content stri
 	}
 
 	color.Cyan("We are trying to translate the code review summary to " + lang)
-	resp, err := client.ChatCompletion(ctx, instruction)
-	if err != nil {
-		return "", err
+
+	var resp *ai.Response
+	spinnerErr := progress.WithSpinnerAndCustomMessages(
+		"🌐 Translating review summary...",
+		"Translation completed",
+		"Failed to translate review summary",
+		func() error {
+			resp, err = client.ChatCompletion(ctx, instruction)
+			return err
+		},
+	)
+	if spinnerErr != nil {
+		return "", spinnerErr
 	}
+
 	color.Magenta(resp.TokenUsage.String())
 	return resp.Text, nil
 }
