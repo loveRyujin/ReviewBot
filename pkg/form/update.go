@@ -141,9 +141,10 @@ func chooseIfUpdateGitConfig(msg tea.Msg, m *Model) (tea.Model, tea.Cmd) {
 		case "j", "down", "k", "up":
 			s := msg.String()
 
-			if s == "k" || s == "up" {
+			switch s {
+			case "k", "up":
 				m.cursor--
-			} else if s == "j" || s == "down" {
+			case "j", "down":
 				m.cursor++
 			}
 
@@ -235,9 +236,10 @@ func chooseIfUpdateProxyConfig(msg tea.Msg, m *Model) (tea.Model, tea.Cmd) {
 		case "j", "down", "k", "up":
 			s := msg.String()
 
-			if s == "k" || s == "up" {
+			switch s {
+			case "k", "up":
 				m.cursor--
-			} else if s == "j" || s == "down" {
+			case "j", "down":
 				m.cursor++
 			}
 

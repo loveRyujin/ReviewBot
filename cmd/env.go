@@ -31,6 +31,6 @@ var keyToEnv = map[string]string{
 
 func init() {
 	for key, env := range keyToEnv {
-		viper.BindEnv(key, defaultEnvPrefix+"_"+env)
+		_ = viper.BindEnv(key, defaultEnvPrefix+"_"+env)
 	}
 }

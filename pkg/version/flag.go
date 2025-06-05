@@ -91,10 +91,11 @@ func AddFlags(fs *pflag.FlagSet) {
 // PrintAndExitIfRequested checks if the `--version` flag was passed, and if so, prints the version and exits.
 func PrintAndExitIfRequested() {
 	// Check the value of the version flag and print the corresponding information
-	if *versionFlag == VersionRaw {
+	switch *versionFlag {
+	case VersionRaw:
 		fmt.Printf("%s\n", Get().Text())
 		os.Exit(0)
-	} else if *versionFlag == VersionEnabled {
+	case VersionEnabled:
 		fmt.Printf("%s\n", Get().String())
 		os.Exit(0)
 	}

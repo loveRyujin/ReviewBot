@@ -227,7 +227,9 @@ func processFileInput(filepath string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	defer file.Close()
+	defer func() {
+		_ = file.Close()
+	}()
 
 	allowed, err := checkFileSize(file)
 	if err != nil {

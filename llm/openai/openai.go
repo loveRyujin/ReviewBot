@@ -105,7 +105,9 @@ func (c *Client) StreamChatCompletion(ctx context.Context, text string, handler 
 	if err != nil {
 		return err
 	}
-	defer stream.Close()
+	defer func() {
+		_ = stream.Close()
+	}()
 
 	color.Yellow("================Review Summary====================" + "\n\n")
 
