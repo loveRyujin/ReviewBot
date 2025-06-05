@@ -92,7 +92,7 @@ reviewbot commit
 git add .
 reviewbot review
 ```
-![review](./images/review.gif)
+![review](./images/review_spinner.gif)
 
 ### 列出可选配置
 ```sh
@@ -122,7 +122,7 @@ reviewbot review --stream=true
 ```sh
 reviewbot review --output_lang=zh-cn
 ```
-![review_translation](./images/review_translation.gif)
+![review_translation](./images/review_spinner_translation.gif)
 ### 从外部源获取git diff
 指定 --mode=external  
 
