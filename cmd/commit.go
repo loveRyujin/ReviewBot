@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"github.com/erikgeiser/promptkit/confirmation"
 	"github.com/fatih/color"
 	"github.com/loveRyujin/ReviewBot/ai"
 	"github.com/loveRyujin/ReviewBot/git"
@@ -9,12 +10,14 @@ import (
 )
 
 var (
+	preview          bool
 	diffUnifiedLines int
 	excludedList     []string
 	amend            bool
 )
 
 func init() {
+	commitCmd.PersistentFlags().BoolVar(&preview, "preview", false, "preview the commit message before committing")
 	commitCmd.PersistentFlags().IntVar(&diffUnifiedLines, "diff_unified", 3, "number of context lines to show in diff")
 	commitCmd.PersistentFlags().StringArrayVar(&excludedList, "exclude_list", []string{}, "list of files to exclude from review")
 	commitCmd.PersistentFlags().BoolVar(&amend, "amend", false, "amend the commit message")
@@ -103,6 +106,16 @@ var commitCmd = &cobra.Command{
 		color.Yellow("================Commit Summary====================")
 		color.Yellow("\n" + commitMsg + "\n\n")
 		color.Yellow("==================================================")
+
+		if preview {
+			ready, err := confirmation.New("\nWhether to commit this preview message?", confirmation.Yes).RunPrompt()
+			if err != nil {
+				return err
+			}
+			if !ready {
+				return nil
+			}
+		}
 
 		output, err := g.Commit(commitMsg)
 		if err != nil {
