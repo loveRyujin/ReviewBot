@@ -86,6 +86,12 @@ git add .
 reviewbot commit
 ```
 ![commit](./images/commit.gif)
+
+```sh
+git add .
+reviewbot commit --preview
+```
+![commit_preview](./images/commit_preview.gif)
   
 ### 进行code review
 ```sh
@@ -111,9 +117,9 @@ reviewbot config set ai.api_key xxxxxx
 ![config_set](./images/config_set.png)
 ![review_config_set](./images/review_config_set.gif)
 ### 流式输出（review命令支持）
-指定 --stream=true
+指定 --stream
 ```sh
-reviewbot review --stream=true
+reviewbot review --stream
 ```
 ![review_stream](./images/review_stream.gif)
 ### 指定语言翻译（review命令支持）
