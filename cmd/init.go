@@ -4,7 +4,6 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/common-nighthawk/go-figure"
 	"github.com/fatih/color"
 	"github.com/loveRyujin/ReviewBot/pkg/form"
 	"github.com/spf13/cobra"
@@ -21,8 +20,7 @@ var initCmd = &cobra.Command{
 	Use:   "init",
 	Short: "Initialize ReviewBot configuration",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		reviewbotFigure := figure.NewFigure("ReviewBot", "", true)
-		color.Cyan("%s\n", reviewbotFigure.String())
+		printProjectName()
 
 		model, err := form.Run()
 		if err != nil {

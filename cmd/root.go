@@ -6,6 +6,8 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/common-nighthawk/go-figure"
+	"github.com/fatih/color"
 	"github.com/loveRyujin/ReviewBot/pkg/version"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -27,6 +29,7 @@ var rootCmd = &cobra.Command{
 	Short:        "A command-line tool that helps generate git commit messages, code reviews, etc.",
 	SilenceUsage: true,
 	Run: func(cmd *cobra.Command, args []string) {
+		printProjectName()
 		version.PrintAndExitIfRequested()
 	},
 }
@@ -81,6 +84,11 @@ func searchDirs() []string {
 	homeDir, err := os.UserHomeDir()
 	cobra.CheckErr(err)
 	return []string{"./config/", ".", filepath.Join(homeDir, defaultConfigDir)}
+}
+
+func printProjectName() {
+	reviewbotFigure := figure.NewFigure("ReviewBot", "", true)
+	color.Cyan("%s\n", reviewbotFigure.String())
 }
 
 func Execute() {
