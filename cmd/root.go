@@ -24,7 +24,7 @@ var (
 
 var rootCmd = &cobra.Command{
 	Use:          "reviewbot",
-	Short:        "help code review when merging code",
+	Short:        "A command-line tool that helps generate git commit messages, code reviews, etc.",
 	SilenceUsage: true,
 	Run: func(cmd *cobra.Command, args []string) {
 		version.PrintAndExitIfRequested()
