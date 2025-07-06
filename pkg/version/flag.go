@@ -96,7 +96,7 @@ func PrintAndExitIfRequested() {
 		fmt.Printf("%s\n", Get().Text())
 		os.Exit(0)
 	case VersionEnabled:
-		fmt.Printf("%s\n", Get().String())
+		fmt.Printf("version: %s\n", Get().String())
 		os.Exit(0)
 	}
 }
