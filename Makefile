@@ -27,6 +27,7 @@ GO_LDFLAGS += \
 build: $(EXECUTABLE)
 
 $(EXECUTABLE): $(GOFILES)
+	$(GO) mod tidy -v 
 	$(GO) build -v -ldflags "$(GO_LDFLAGS)" -o bin/$@ ./cmd/$(EXECUTABLE)
 
 ## build_linux_amd64: build the reviewbot binary for linux amd64
