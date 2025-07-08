@@ -30,6 +30,10 @@ var rootCmd = &cobra.Command{
 	SilenceUsage: true,
 	Run: func(cmd *cobra.Command, args []string) {
 		printProjectName()
+		color.Blue("Welcome to ReviewBot! 🎉")
+		color.Blue("Run `reviewbot --help` for quick start.")
+		color.Blue("You can also run `reviewbot init` to generate a configuration file.")
+		color.Blue("For usage instructions and examples, please check the README documentation: https://github.com/loveRyujin/ReviewBot/blob/master/README.md .")
 		version.PrintAndExitIfRequested()
 	},
 }
