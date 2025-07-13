@@ -29,11 +29,7 @@ var rootCmd = &cobra.Command{
 	Short:        "A command-line tool that helps generate git commit messages, code reviews, etc.",
 	SilenceUsage: true,
 	Run: func(cmd *cobra.Command, args []string) {
-		printProjectName()
-		color.Blue("Welcome to ReviewBot! 🎉")
-		color.Blue("Run `reviewbot --help` for quick start.")
-		color.Blue("You can also run `reviewbot init` to generate a configuration file.")
-		color.Blue("For usage instructions and examples, please check the README documentation: https://github.com/loveRyujin/ReviewBot/blob/master/README.md .")
+		welcome()
 		version.PrintAndExitIfRequested()
 	},
 }
@@ -49,6 +45,14 @@ func init() {
 	version.AddFlags(rootCmd.Flags())
 
 	rootCmd.CompletionOptions.HiddenDefaultCmd = true
+
+	// save the original help function and set a custom one
+	originalHelpFunc := rootCmd.HelpFunc()
+	helpF := func(cmd *cobra.Command, args []string) {
+		printProjectName()
+		originalHelpFunc(cmd, args)
+	}
+	rootCmd.SetHelpFunc(helpF)
 
 	once.Do(func() {
 		ServerOption = NewServerOptions()
@@ -88,6 +92,14 @@ func searchDirs() []string {
 	homeDir, err := os.UserHomeDir()
 	cobra.CheckErr(err)
 	return []string{"./config/", ".", filepath.Join(homeDir, defaultConfigDir)}
+}
+
+func welcome() {
+	printProjectName()
+	color.Blue("Welcome to ReviewBot! 🎉")
+	color.Blue("Run `reviewbot --help` for quick start.")
+	color.Blue("You can also run `reviewbot init` to generate a configuration file.")
+	color.Blue("For usage instructions and examples, please check the README documentation: https://github.com/loveRyujin/ReviewBot/blob/master/README.md .")
 }
 
 func printProjectName() {
