@@ -5,3 +5,6 @@ bin/
 
 # Added by goreleaser init:
 dist/
+
+# vhs
+reviewbot.tape

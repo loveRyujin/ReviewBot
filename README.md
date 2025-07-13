@@ -13,7 +13,13 @@ reviewbot -h\--help
 
 输出以下内容，代表安装成功：
 ```
-help code review when merging code
+  ____                   _                     ____            _
+ |  _ \    ___  __   __ (_)   ___  __      __ | __ )    ___   | |_
+ | |_) |  / _ \ \ \ / / | |  / _ \ \ \ /\ / / |  _ \   / _ \  | __|
+ |  _ <  |  __/  \ V /  | | |  __/  \ V  V /  | |_) | | (_) | | |_
+ |_| \_\  \___|   \_/   |_|  \___|   \_/\_/   |____/   \___/   \__|
+
+A command-line tool that helps generate git commit messages, code reviews, etc.
 
 Usage:
   reviewbot [flags]
@@ -33,6 +39,7 @@ Flags:
 
 Use "reviewbot [command] --help" for more information about a command.
 ```  
+![reviewbot](./images/reviewbot.gif)
 
 从源码安装（需要go version为1.24.0以上）：
 ```sh
@@ -78,7 +85,7 @@ reviewbot --version=raw
 ```sh
 reviewbot init
 ```
-![init](./images/init.gif)
+![reviewbot_init](./images/reviewbot_init.gif)
 
 ### 生成git commit message
 ```sh
