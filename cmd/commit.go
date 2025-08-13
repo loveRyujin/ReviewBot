@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"html"
+
 	"github.com/erikgeiser/promptkit/confirmation"
 	"github.com/fatih/color"
 	"github.com/loveRyujin/ReviewBot/ai"
@@ -104,7 +106,7 @@ var commitCmd = &cobra.Command{
 
 		// Output commit message from AI
 		color.Yellow("================Commit Summary====================")
-		color.Yellow("\n" + commitMsg + "\n\n")
+		color.Yellow("\n" + html.UnescapeString(commitMsg) + "\n\n")
 		color.Yellow("==================================================")
 
 		if preview {
