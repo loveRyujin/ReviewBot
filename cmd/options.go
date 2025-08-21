@@ -31,11 +31,11 @@ func NewServerOptions() *ServerOptions {
 }
 
 func (s *ServerOptions) Initialize() error {
-	if err := s.applyCfg(); err != nil {
+	if err := viper.Unmarshal(s); err != nil {
 		return err
 	}
 
-	if err := viper.Unmarshal(s); err != nil {
+	if err := s.applyCfg(); err != nil {
 		return err
 	}
 
@@ -132,6 +132,10 @@ func (s *ServerOptions) applyCfg() error {
 
 	if diffFile != "" {
 		s.GitOptions.DiffFile = diffFile
+	}
+
+	if amend {
+		s.GitOptions.Amend = true
 	}
 
 	if maxInputSize != 20*1024*1024 {
