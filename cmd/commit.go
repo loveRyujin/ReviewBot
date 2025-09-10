@@ -104,9 +104,11 @@ var commitCmd = &cobra.Command{
 			return err
 		}
 
+		escapeCommitMsg := html.UnescapeString(commitMsg)
+
 		// Output commit message from AI
 		color.Yellow("================Commit Summary====================")
-		color.Yellow("\n" + html.UnescapeString(commitMsg) + "\n\n")
+		color.Yellow("\n" + escapeCommitMsg + "\n\n")
 		color.Yellow("==================================================")
 
 		if preview {
@@ -119,7 +121,7 @@ var commitCmd = &cobra.Command{
 			}
 		}
 
-		output, err := g.Commit(commitMsg)
+		output, err := g.Commit(escapeCommitMsg)
 		if err != nil {
 			return err
 		}
