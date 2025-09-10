@@ -159,4 +159,6 @@ reviewbot review --mode=external your_git_diff_content
 ![review_external_args](./images/review_external_args.gif)
 
 ## 其它
-目前支持访问openai和deepseek。国内因为某种原因无法直接访问openai的服务，可以参考该项目config目录下的reviewbot.yaml在对应路径进行配置，访问deepseek的服务，或者自己配置proxy.proxy_url。
+国内因为某种原因无法直接访问某些大模型的api服务，可以参考该项目config目录下的reviewbot.yaml在对应路径进行配置，配置对应的base_url。
+
+推荐使用[openrouter](https://openrouter.ai/)。

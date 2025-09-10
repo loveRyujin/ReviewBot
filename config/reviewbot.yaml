@@ -1,7 +1,7 @@
 ai:
     api_key: xxxxxx
-    base_url: https://api.deepseek.com/v1
-    model: deepseek-chat
+    base_url: https://openrouter.ai/api/v1
+    model: deepseek/deepseek-chat-v3.1:free
     provider: deepseek
 git:
     amend: false
