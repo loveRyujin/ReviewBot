@@ -51,7 +51,7 @@ go install github.com/loveRyujin/ReviewBot/cmd/reviewbot@latest
 git clone https://github.com/loveRyujin/ReviewBot.git
 make build
 ```
-同时支持编译不同平台的二进制文件，具体参考Makefile。
+同时支持编译不同平台的二进制文件，具体参考Makefile。(windows推荐在git bash下执行make命令)
 
 ## 功能
 - 帮助生成git commit message（遵循conventional commits规范）
