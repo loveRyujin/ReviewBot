@@ -1,19 +1,19 @@
 # Repository Guidelines
 
 ## Project Structure & Module Organization
-ReviewBot is a Go module built around a single CLI binary. Source code lives in `cmd/reviewbot` for the executable and `pkg` for reusable packages (`pkg/command`, `pkg/form`, `pkg/progress`, `pkg/version`). Provider integrations and prompt assets reside in `ai/`, `llm/`, and `prompt/`. Configuration examples are under `config/`, while release artifacts land in `release/<platform>/`. Tests accompany their packages, e.g. `pkg/command/command_test.go` and `prompt/translation_test.go`. UI assets and demos are stored in `images/`. CI workflows are defined in `.github/workflows/`.
+ReviewBot is a Go module built around the `reviewbot` CLI. Entry commands live in `cmd/`, reusable helpers in `pkg/`, and provider integrations under `ai/` and `llm/`. Prompt templates and translation helpers are in `prompt/`. Configuration samples reside in `config/`, release builds in `release/<platform>/`, and demo assets in `images/`. Tests sit beside their packages, for example `pkg/command/command_test.go` and `prompt/translation_test.go`. CI configs live in `.github/workflows/`.
 
 ## Build, Test, and Development Commands
-- `make build`: runs `go mod tidy`, compiles the binary, and drops it in `bin/reviewbot`.
-- `make build_<target>`: cross-compiles into the matching `release/<os>/<arch>/` folder (see Makefile).
-- `go test ./...`: executes the entire test suite; use `-run` to scope changes.
-- `go run ./cmd/reviewbot --help`: quick local smoke test of CLI options.
+- `make build`: runs `go mod tidy`, compiles the binary, and emits `bin/reviewbot`.
+- `make build_<target>`: cross-compiles into `release/<os>/<arch>/` (see Makefile targets).
+- `go test ./...`: executes the full test suite; add `-run <pattern>` for narrower checks.
+- `go run ./cmd/reviewbot --help`: fast manual verification of CLI wiring.
 
 ## Coding Style & Naming Conventions
-Follow idiomatic Go style. Format all Go files with `gofmt` or `go fmt ./...` before committing. Exported types and functions use PascalCase; keep unexported helpers in lowerCamelCase. Prefer table-driven tests and keep files under 400 lines for readability. When adding prompts or configs, mirror existing naming (e.g., `prompt/template/<feature>.tmpl`, `config/reviewbot.yaml`).
+Follow idiomatic Go style. Format Go files with `gofmt` or `go fmt ./...`. Exported types and functions use PascalCase; keep unexported helpers camelCase. Prefer table-driven tests and keep files under 400 lines for readability. When adding prompts or configs, mirror the existing naming (e.g., `prompt/template/<feature>.tmpl`, `config/reviewbot.yaml`).
 
 ## Testing Guidelines
-Place tests alongside implementation using the `TestXxx` naming scheme. For features touching external services, stub providers via the abstractions in `pkg/command`. Maintain existing coverage by exercising new branches with table-driven cases. Run `go test -cover ./...` before opening a pull request, and document any gaps.
+Place tests alongside implementation using the `TestXxx` naming scheme. For features touching external services, stub providers via the adapters in `pkg/command`. Maintain coverage by exercising new branches with table-driven cases. Run `go test -cover ./...` before opening a pull request, and record any unavoidable gaps.
 
 ## Commit & Pull Request Guidelines
-Commit messages follow Conventional Commits (`feat:`, `fix:`, `docs:`) as shown in the recent Git history. Group related edits and avoid mixing refactors with feature work. Pull requests should include: a concise summary, reproduction or verification steps (commands, screenshots, or GIFs when UI output changes), updated docs for configuration changes, and references to related issues or discussions.
+Commit messages follow Conventional Commits (`feat:`, `fix:`, `docs:`). Group related edits and avoid mixing refactors with feature work. Pull requests should include: a concise summary, verification steps (commands, screenshots, or GIFs when output changes), updated docs for configuration changes, and links to related issues or discussions. Document translation behaviors or language additions when touching `--output_lang`.
