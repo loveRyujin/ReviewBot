@@ -31,22 +31,21 @@ var commitCmd = &cobra.Command{
 	Use:   "commit",
 	Short: "Automically generate commit message",
 	PreRun: func(cmd *cobra.Command, args []string) {
-		initConfig()
+		if err := initConfig(); err != nil {
+			cobra.CheckErr(err)
+		}
+		applyCommitOverrides()
 	},
 	RunE: func(cmd *cobra.Command, args []string) error {
-		if err := ServerOption.Initialize(); err != nil {
-			return err
-		}
-
 		// generate diff info
-		g := ServerOption.GitConfig().New()
+		g := globalConfig.GitCommandConfig().New()
 		diff, err := g.DiffFiles()
 		if err != nil {
 			return err
 		}
 
-		currentModel := ServerOption.AiOptions.Model
-		provider := ai.Provider(ServerOption.AiOptions.Provider)
+		currentModel := globalConfig.AI.Model
+		provider := ai.Provider(globalConfig.AI.Provider)
 		client, err := GetModelClient(provider)
 		if err != nil {
 			return err
@@ -106,7 +105,7 @@ var commitCmd = &cobra.Command{
 		}
 
 		escapeCommitMsg := html.UnescapeString(commitMsg)
-		lang := prompt.GetLanguage(ServerOption.GitOptions.Lang)
+		lang := prompt.GetLanguage(globalConfig.Git.Lang)
 		commitOutput := escapeCommitMsg
 
 		if lang != prompt.DefaultLanguage {
@@ -140,4 +139,23 @@ var commitCmd = &cobra.Command{
 
 		return nil
 	},
+}
+
+// applyCommitOverrides applies command-line flags to the global configuration
+func applyCommitOverrides() {
+	if diffUnifiedLines != 3 {
+		globalConfig.Git.DiffUnified = diffUnifiedLines
+	}
+	if len(excludedList) > 0 {
+		globalConfig.Git.ExcludedList = append(globalConfig.Git.ExcludedList, excludedList...)
+	}
+	if amend {
+		globalConfig.Git.Amend = true
+	}
+	if outputLang != "en" {
+		globalConfig.Git.Lang = outputLang
+	}
+	if preview {
+		globalConfig.Runtime.Commit.Preview = true
+	}
 }

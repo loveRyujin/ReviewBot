@@ -25,7 +25,9 @@ var configSetCmd = &cobra.Command{
 	Short: "Set configuration value",
 	Args:  cobra.MinimumNArgs(2),
 	PreRun: func(cmd *cobra.Command, args []string) {
-		initConfig()
+		if err := initConfig(); err != nil {
+			cobra.CheckErr(err)
+		}
 	},
 	RunE: func(cmd *cobra.Command, args []string) error {
 		// check if the key is valid
