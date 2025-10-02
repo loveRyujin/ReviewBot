@@ -23,6 +23,7 @@ func init() {
 	commitCmd.PersistentFlags().IntVar(&diffUnifiedLines, "diff_unified", 3, "number of context lines to show in diff")
 	commitCmd.PersistentFlags().StringArrayVar(&excludedList, "exclude_list", []string{}, "list of files to exclude from review")
 	commitCmd.PersistentFlags().BoolVar(&amend, "amend", false, "amend the commit message")
+	commitCmd.PersistentFlags().StringVar(&outputLang, "output_lang", "en", "output language of the commit message(default: English)")
 }
 
 // commitCmd is a Cobra command that automates the generation of commit messages
@@ -105,10 +106,20 @@ var commitCmd = &cobra.Command{
 		}
 
 		escapeCommitMsg := html.UnescapeString(commitMsg)
+		lang := prompt.GetLanguage(ServerOption.GitOptions.Lang)
+		commitOutput := escapeCommitMsg
+
+		if lang != prompt.DefaultLanguage {
+			translated, err := translateContent(cmd.Context(), client, escapeCommitMsg, lang)
+			if err != nil {
+				return err
+			}
+			commitOutput = translated
+		}
 
 		// Output commit message from AI
 		color.Yellow("================Commit Summary====================")
-		color.Yellow("\n" + escapeCommitMsg + "\n\n")
+		color.Yellow("\n" + commitOutput + "\n")
 		color.Yellow("==================================================")
 
 		if preview {
@@ -121,7 +132,7 @@ var commitCmd = &cobra.Command{
 			}
 		}
 
-		output, err := g.Commit(escapeCommitMsg)
+		output, err := g.Commit(commitOutput)
 		if err != nil {
 			return err
 		}

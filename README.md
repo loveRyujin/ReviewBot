@@ -129,11 +129,13 @@ reviewbot config set ai.api_key xxxxxx
 reviewbot review --stream
 ```
 ![review_stream](./images/review_stream.gif)
-### 指定语言翻译（review命令支持）
-指定 --output_lang=lang，支持（en、zh-cn、zh-tw、jp）  
+### 指定语言翻译（review、commit命令支持）
+指定 --output_lang=lang，支持（en、zh-cn、zh-tw、jp） 
 
 ```sh
 reviewbot review --output_lang=zh-cn
+
+reviewbot commit --output_lang=zh-cn
 ```
 ![review_translation](./images/review_spinner_translation.gif)
 ### 从外部源获取git diff

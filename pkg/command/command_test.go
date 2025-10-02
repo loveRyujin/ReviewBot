@@ -1,6 +1,9 @@
 package command
 
-import "testing"
+import (
+	"runtime"
+	"testing"
+)
 
 func Test_IsCommandAvailable(t *testing.T) {
 	testCases := []struct {
@@ -9,13 +12,13 @@ func Test_IsCommandAvailable(t *testing.T) {
 		expected bool
 	}{
 		{
-			name:     "valid command-1",
-			command:  "pwd",
+			name:     "valid command-2",
+			command:  "git",
 			expected: true,
 		},
 		{
-			name:     "valid command-2",
-			command:  "git",
+			name:     "valid shell command",
+			command:  defaultShellCommand(),
 			expected: true,
 		},
 
@@ -34,4 +37,11 @@ func Test_IsCommandAvailable(t *testing.T) {
 			}
 		})
 	}
+}
+
+func defaultShellCommand() string {
+	if runtime.GOOS == "windows" {
+		return "cmd"
+	}
+	return "sh"
 }
