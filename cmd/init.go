@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 
@@ -33,11 +34,25 @@ var initCmd = &cobra.Command{
 		}
 
 		// set viper config file path
-		viper.SetConfigFile(filepath.Join(home, defaultConfigDir, defaultConfigFile))
-		if initConfigPath != "" {
-			// if a custom config path is provided, use it
-			viper.SetConfigFile(initConfigPath)
+		defaultConfigFilePath := filepath.Join(home, defaultConfigDir, defaultConfigFile)
+
+		resolvedConfigFilePath, err := resolveConfigFilePath(defaultConfigFilePath)
+		if err != nil {
+			return err
 		}
+
+		if initConfigPath != "" {
+			resolvedConfigFilePath, err = resolveConfigFilePath(initConfigPath)
+			if err != nil {
+				return err
+			}
+		}
+
+		if err := ensureConfigDir(resolvedConfigFilePath); err != nil {
+			return err
+		}
+
+		viper.SetConfigFile(resolvedConfigFilePath)
 
 		settingsToSet := make(map[string]any)
 
@@ -106,4 +121,45 @@ var initCmd = &cobra.Command{
 
 		return nil
 	},
+}
+
+// resolveConfigFilePath returns an absolute file path using the current OS separators
+// and verifies the path points to a file location (not a directory).
+func resolveConfigFilePath(input string) (string, error) {
+	if input == "" {
+		return "", fmt.Errorf("config path must not be empty")
+	}
+
+	cleanedPath := filepath.Clean(filepath.FromSlash(input))
+	if cleanedPath == "" || cleanedPath == "." {
+		return "", fmt.Errorf("config path %q is not valid", input)
+	}
+
+	if !filepath.IsAbs(cleanedPath) {
+		absolutePath, err := filepath.Abs(cleanedPath)
+		if err != nil {
+			return "", err
+		}
+		cleanedPath = absolutePath
+	}
+
+	if info, err := os.Stat(cleanedPath); err != nil {
+		if !os.IsNotExist(err) {
+			return "", err
+		}
+	} else if info.IsDir() {
+		return "", fmt.Errorf("config path %q is a directory; provide a file path", cleanedPath)
+	}
+
+	return cleanedPath, nil
+}
+
+// ensureConfigDir makes sure the directory for the config file exists before writing.
+func ensureConfigDir(configFilePath string) error {
+	dir := filepath.Dir(configFilePath)
+	if dir == "" {
+		return fmt.Errorf("could not determine directory for config path %q", configFilePath)
+	}
+
+	return os.MkdirAll(dir, 0o755)
 }
