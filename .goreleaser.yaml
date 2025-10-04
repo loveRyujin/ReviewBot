@@ -57,6 +57,10 @@ changelog:
   use: github
   sort: asc
   format: "{{.SHA}}: {{.Message}} (@{{.AuthorUsername}})"
+  filters:
+    exclude:
+      - "Merge pull request"
+      - "Merge branch "
   groups:
     - title: Features
       regexp: "^.*feat[(\\w)]*:+.*$"
