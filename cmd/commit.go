@@ -158,4 +158,10 @@ func applyCommitOverrides() {
 	if preview {
 		globalConfig.Runtime.Commit.Preview = true
 	}
+	if aiProviderFlag != "" {
+		globalConfig.AI.Provider = aiProviderFlag
+	}
+	if aiModelFlag != "" {
+		globalConfig.AI.Model = aiModelFlag
+	}
 }

@@ -323,4 +323,10 @@ func applyReviewOverrides() {
 	if stream {
 		globalConfig.Runtime.Review.Stream = true
 	}
+	if aiProviderFlag != "" {
+		globalConfig.AI.Provider = aiProviderFlag
+	}
+	if aiModelFlag != "" {
+		globalConfig.AI.Model = aiModelFlag
+	}
 }

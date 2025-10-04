@@ -16,6 +16,8 @@ var (
 	configPath       string
 	defaultEnvPrefix = "REVIEWBOT"
 	replacer         = strings.NewReplacer(".", "_", "-", "_")
+	aiProviderFlag   string
+	aiModelFlag      string
 
 	defaultConfigDir  = ".config/reviewbot"
 	defaultConfigFile = "reviewbot.yaml"
@@ -41,6 +43,8 @@ func init() {
 	rootCmd.AddCommand(commitCmd)
 
 	rootCmd.PersistentFlags().StringVarP(&configPath, "config", "c", "", "config file path")
+	rootCmd.PersistentFlags().StringVar(&aiProviderFlag, "ai-provider", "", "AI provider to use for requests")
+	rootCmd.PersistentFlags().StringVar(&aiModelFlag, "ai-model", "", "AI model identifier to use")
 
 	version.AddFlags(rootCmd.Flags())
 

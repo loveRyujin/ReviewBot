@@ -57,10 +57,12 @@ Use "reviewbot [command] --help" for more information about a command.
 - 支持自定义 git diff 的上下文行数。
 - 支持配置需要忽略的文件列表。
 - 支持 proxy、base_url、请求超时等网络相关配置。
+- 支持通过配置或命令行参数自定义 AI provider / model。
 
 ## 使用方法
 ### 配置方式
 - 命令行参数（使用 `-h` 或 `--help` 查看各命令的参数）。
+- 全局参数 、 可以在命令行覆盖当前会话的模型提供方与模型，优先级高于配置文件与环境变量。
 - 环境变量（以 `REVIEWBOT` 为前缀，使用 `_` 连接，例如 `REVIEWBOT_AI_BASE_URL` 对应配置项 `ai.base_url`）。
 - YAML 配置文件（按优先级从低到高依次读取：`~/.config/reviewbot/reviewbot.yaml`、项目根目录、根目录下的 `config` 目录）。
 - 运行 `reviewbot init` 命令，根据引导输入配置，系统会在默认路径 `~/.config/reviewbot/reviewbot.yaml` 生成配置文件。
