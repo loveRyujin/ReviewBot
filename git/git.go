@@ -8,7 +8,85 @@ import (
 )
 
 var excludeFromDiff = []string{
+	// Go module artifacts
 	"go.sum",
+	"go.work.sum",
+	"coverage.out",
+
+	// Generic build outputs
+	"**/bin/",
+	"**/build/",
+	"**/dist/",
+	"**/out/",
+	"**/release/",
+	"**/tmp/",
+	"**/coverage/",
+
+	// JavaScript / TypeScript
+	"**/node_modules/",
+	"**/.next/",
+	"**/.nuxt/",
+	"**/.turbo/",
+
+	// Python
+	"**/__pycache__/",
+	"**/*.pyc",
+	"**/.pytest_cache/",
+	"**/.mypy_cache/",
+	"**/.ruff_cache/",
+
+	// Java / Kotlin / JVM
+	"**/.gradle/",
+	"**/*.class",
+	"**/target/",
+
+	// .NET
+	"**/obj/",
+
+	// Apple / Xcode
+	"**/DerivedData/",
+	"**/*.xcuserstate",
+
+	// IDE / OS metadata
+	"**/.DS_Store",
+	"**/.idea/",
+	"**/.vscode/",
+	"**/*.iml",
+
+	// Compiled binaries and archives
+	"**/*.exe",
+
+	// C, C++, Rust, Go
+	"**/*.obj",
+	"**/*.pdb",
+	"**/*.lib",
+	"**/*.gcda",
+	"**/*.gcno",
+	"**/*.gch",
+	"**/*.pch",
+	"**/*.rlib",
+	"**/*.dSYM/",
+	"**/*.profraw",
+	"**/*.profdata",
+	"**/*.prof",
+	"**/*.test",
+	"**/*.dll",
+	"**/*.so",
+	"**/*.dylib",
+	"**/*.a",
+	"**/*.o",
+	"**/*.jar",
+	"**/*.war",
+	"**/*.zip",
+	"**/*.tar",
+	"**/*.tgz",
+	"**/*.gz",
+
+	// Logs and editor backups
+	"**/*.log",
+	"**/*.tmp",
+	"**/*.swp",
+	"**/*.swo",
 }
 
 type Command struct {
