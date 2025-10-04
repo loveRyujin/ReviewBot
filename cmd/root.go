@@ -4,13 +4,12 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	"sync"
 
 	"github.com/common-nighthawk/go-figure"
 	"github.com/fatih/color"
+	"github.com/loveRyujin/ReviewBot/pkg/config"
 	"github.com/loveRyujin/ReviewBot/pkg/version"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 var (
@@ -21,7 +20,8 @@ var (
 	defaultConfigDir  = ".config/reviewbot"
 	defaultConfigFile = "reviewbot.yaml"
 
-	once sync.Once
+	// globalConfig holds the loaded application configuration
+	globalConfig *config.Config
 )
 
 var rootCmd = &cobra.Command{
@@ -53,37 +53,20 @@ func init() {
 		originalHelpFunc(cmd, args)
 	}
 	rootCmd.SetHelpFunc(helpF)
+}
 
-	once.Do(func() {
-		ServerOption = NewServerOptions()
+// initConfig loads configuration using the new config package.
+func initConfig() error {
+	var err error
+	globalConfig, err = config.Load(config.LoadOptions{
+		ExplicitPath: configPath,
+		SearchDirs:   searchDirs(),
+		ConfigName:   strings.TrimSuffix(defaultConfigFile, ".yaml"),
+		ConfigType:   "yaml",
+		EnvPrefix:    defaultEnvPrefix,
+		Replacer:     replacer,
 	})
-}
-
-// initConfig reads in config file and ENV variables.
-func initConfig() {
-	if configPath != "" {
-		viper.SetConfigFile(configPath)
-	} else {
-		for _, dir := range searchDirs() {
-			viper.AddConfigPath(dir)
-		}
-
-		viper.SetConfigName(defaultConfigFile)
-		viper.SetConfigType("yaml")
-	}
-
-	setupEnvironmentVariables()
-
-	if err := viper.ReadInConfig(); err != nil {
-		cobra.CheckErr(err)
-	}
-}
-
-// setupEnvironmentVariables sets up the environment variables for viper.
-func setupEnvironmentVariables() {
-	viper.AutomaticEnv()
-	viper.SetEnvPrefix(defaultEnvPrefix)
-	viper.SetEnvKeyReplacer(replacer)
+	return err
 }
 
 // searchDirs returns the directories to search for the config file.

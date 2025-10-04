@@ -1,4 +1,4 @@
-GO ?= go
+﻿GO ?= go
 EXECUTABLE := reviewbot
 GOFILES := $(shell find . -type f -name "*.go")
 
@@ -16,18 +16,24 @@ ifeq (, $(shell git status --porcelain 2>/dev/null))
 endif
 GIT_COMMIT:=$(shell git rev-parse HEAD)
 
+ifeq ($(OS),Windows_NT)
+BUILD_DATE := $(shell powershell.exe -NoLogo -NoProfile -Command "(Get-Date).ToUniversalTime().ToString('yyyy-MM-ddTHH:mm:ssK')")
+else
+BUILD_DATE := $(shell date -u +'%Y-%m-%dT%H:%M:%SZ')
+endif
+
 GO_LDFLAGS += \
     -X $(VERSION_PACKAGE).gitVersion=$(VERSION) \
     -X $(VERSION_PACKAGE).gitCommit=$(GIT_COMMIT) \
     -X $(VERSION_PACKAGE).gitTreeState=$(GIT_TREE_STATE) \
-    -X $(VERSION_PACKAGE).buildDate=$(shell date -u +'%Y-%m-%dT%H:%M:%SZ')
+    -X $(VERSION_PACKAGE).buildDate=$(BUILD_DATE)
 
 
 ## build: build the reviewbot binary
 build: $(EXECUTABLE)
 
 $(EXECUTABLE): $(GOFILES)
-	$(GO) mod tidy -v 
+	$(GO) mod tidy -v
 	$(GO) build -v -ldflags "$(GO_LDFLAGS)" -o bin/$@ ./cmd/$(EXECUTABLE)
 
 ## build_linux_amd64: build the reviewbot binary for linux amd64
@@ -49,3 +55,20 @@ build_mac_intel:
 ## build_windows_64: build the reviewbot binary for windows 64
 build_windows_64:
 	CGO_ENABLED=0 GOOS=windows GOARCH=amd64 $(GO) build -a -ldflags "$(GO_LDFLAGS)" -o release/windows/intel/$(EXECUTABLE).exe ./cmd/$(EXECUTABLE)
+
+INSTALL_BIN := $(shell $(GO) env GOBIN)
+ifeq ($(INSTALL_BIN),)
+INSTALL_BIN := $(shell $(GO) env GOPATH)/bin
+endif
+
+ifeq ($(OS),Windows_NT)
+INSTALL_TARGET := $(INSTALL_BIN)/$(EXECUTABLE).exe
+else
+INSTALL_TARGET := $(INSTALL_BIN)/$(EXECUTABLE)
+endif
+
+## install: build and install the reviewbot binary into GOBIN (or GOPATH/bin)
+install: build
+	$(GO) install -ldflags "$(GO_LDFLAGS)" ./cmd/$(EXECUTABLE)
+
+.PHONY: build build_linux_amd64 build_linux_arm64 build_linux_arm build_mac_intel build_windows_64 install

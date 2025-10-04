@@ -9,18 +9,18 @@ import (
 )
 
 func NewOpenAIClient() (*openai.Client, error) {
-	proxyCfg := ServerOption.ProxyConfig()
-	return ServerOption.OpenaiConfig().New(proxyCfg)
+	proxyCfg := globalConfig.ProxyConfig()
+	return globalConfig.OpenAIConfig().New(proxyCfg)
 }
 
 func NewDeepSeekClient() (*openai.Client, error) {
-	proxyCfg := ServerOption.ProxyConfig()
-	return ServerOption.DeepSeekConfig().New(proxyCfg)
+	proxyCfg := globalConfig.ProxyConfig()
+	return globalConfig.DeepSeekConfig().New(proxyCfg)
 }
 
 func NewGeminiClient() (*gemini.Client, error) {
-	proxyCfg := ServerOption.ProxyConfig()
-	return ServerOption.GeminiConfig().New(proxyCfg)
+	proxyCfg := globalConfig.ProxyConfig()
+	return globalConfig.GeminiConfig().New(proxyCfg)
 }
 
 func GetModelClient(provider ai.Provider) (ai.TextGenerator, error) {

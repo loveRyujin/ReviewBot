@@ -46,7 +46,9 @@ var configListCmd = &cobra.Command{
 	Use:   "list",
 	Short: "List all configuration settings",
 	PreRun: func(cmd *cobra.Command, args []string) {
-		initConfig()
+		if err := initConfig(); err != nil {
+			cobra.CheckErr(err)
+		}
 	},
 	Run: func(cmd *cobra.Command, args []string) {
 		headerFmt := color.New(color.FgGreen, color.Underline).SprintfFunc()

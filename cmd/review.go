@@ -43,20 +43,19 @@ var reviewCmd = &cobra.Command{
 	Use:   "review",
 	Short: "Auto review code changes in git stage",
 	PreRun: func(cmd *cobra.Command, args []string) {
-		initConfig()
+		if err := initConfig(); err != nil {
+			cobra.CheckErr(err)
+		}
+		applyReviewOverrides()
 	},
 	RunE: func(cmd *cobra.Command, args []string) error {
-		if err := ServerOption.Initialize(); err != nil {
-			return err
-		}
-
 		// generate diff info
 		diff, err := getDiffContent(args)
 		if err != nil {
 			return err
 		}
 
-		aiProvider := ai.Provider(ServerOption.AiOptions.Provider)
+		aiProvider := ai.Provider(globalConfig.AI.Provider)
 		aiModelClient, err := GetModelClient(aiProvider)
 		if err != nil {
 			return err
@@ -69,7 +68,7 @@ var reviewCmd = &cobra.Command{
 		}
 
 		// get the language of output summary
-		lang := prompt.GetLanguage(ServerOption.GitOptions.Lang)
+		lang := prompt.GetLanguage(globalConfig.Git.Lang)
 
 		color.Cyan("We are trying to review code changes")
 
@@ -84,16 +83,16 @@ func getDiffContent(args []string) (string, error) {
 
 	switch mode {
 	case ModeLocal:
-		g := ServerOption.GitConfig().New()
+		g := globalConfig.GitCommandConfig().New()
 		gitDiffContent, err = g.DiffFiles()
 	case ModeExternal:
 		if len(args) != 0 { // get git diff content from arguments
-			if len(args[0]) >= ServerOption.GitOptions.MaxInputSize {
+			if len(args[0]) >= globalConfig.Git.MaxInputSize {
 				return "", errors.New("git diff input size exceeds limit")
 			}
 			gitDiffContent = args[0]
 		} else if diffFile != "" { // get git diff content from file
-			gitDiffContent, err = processFileInput(ServerOption.GitOptions.DiffFile)
+			gitDiffContent, err = processFileInput(globalConfig.Git.DiffFile)
 		} else { // get git diff content from stdin
 			gitDiffContent, err = processStdinInput()
 		}
@@ -291,9 +290,37 @@ func checkFileSize(f *os.File) (bool, error) {
 		return false, err
 	}
 
-	if stat.Size() >= int64(ServerOption.GitOptions.MaxInputSize) {
+	if stat.Size() >= int64(globalConfig.Git.MaxInputSize) {
 		return false, nil
 	}
 
 	return true, nil
+}
+
+// applyReviewOverrides applies command-line flags to the global configuration
+func applyReviewOverrides() {
+	if diffUnifiedLines != 3 {
+		globalConfig.Git.DiffUnified = diffUnifiedLines
+	}
+	if len(excludedList) > 0 {
+		globalConfig.Git.ExcludedList = append(globalConfig.Git.ExcludedList, excludedList...)
+	}
+	if amend {
+		globalConfig.Git.Amend = true
+	}
+	if mode != "" {
+		globalConfig.Runtime.Review.Mode = mode
+	}
+	if diffFile != "" {
+		globalConfig.Git.DiffFile = diffFile
+	}
+	if maxInputSize != 20*1024*1024 {
+		globalConfig.Git.MaxInputSize = maxInputSize
+	}
+	if outputLang != "en" {
+		globalConfig.Git.Lang = outputLang
+	}
+	if stream {
+		globalConfig.Runtime.Review.Stream = true
+	}
 }
