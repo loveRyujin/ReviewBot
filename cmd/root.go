@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"errors"
 	"os"
 	"path/filepath"
 	"strings"
@@ -11,6 +12,7 @@ import (
 	"github.com/loveRyujin/ReviewBot/pkg/version"
 	"github.com/loveRyujin/ReviewBot/prompt"
 	"github.com/spf13/cobra"
+	"gopkg.in/yaml.v3"
 )
 
 var (
@@ -63,6 +65,11 @@ func init() {
 // initConfig loads configuration using the new config package.
 func initConfig() error {
 	var err error
+	if configPath == "" {
+		if err := ensureDefaultConfigFile(); err != nil {
+			return err
+		}
+	}
 	globalConfig, err = config.Load(config.LoadOptions{
 		ExplicitPath: configPath,
 		SearchDirs:   searchDirs(),
@@ -81,10 +88,9 @@ func initConfig() error {
 
 // searchDirs returns the directories to search for the config file.
 func searchDirs() []string {
-	// get user home dir
-	homeDir, err := os.UserHomeDir()
+	configDir, err := resolveDefaultConfigDir()
 	cobra.CheckErr(err)
-	return []string{"./config/", ".", filepath.Join(homeDir, defaultConfigDir)}
+	return []string{"./config/", ".", configDir}
 }
 
 func welcome() {
@@ -104,4 +110,42 @@ func Execute() {
 	if err := rootCmd.Execute(); err != nil {
 		os.Exit(1)
 	}
+}
+
+// ensureDefaultConfigFile writes the default config to the user config dir if none exists.
+func ensureDefaultConfigFile() error {
+	configDir, err := resolveDefaultConfigDir()
+	if err != nil {
+		return err
+	}
+	configFile := filepath.Join(configDir, defaultConfigFile)
+
+	if _, err := os.Stat(configFile); err == nil {
+		return nil
+	} else if !errors.Is(err, os.ErrNotExist) {
+		return err
+	}
+
+	if err := os.MkdirAll(configDir, 0o755); err != nil {
+		return err
+	}
+
+	defaultCfg := config.NewDefault()
+	content, err := yaml.Marshal(defaultCfg)
+	if err != nil {
+		return err
+	}
+
+	return os.WriteFile(configFile, content, 0o600)
+}
+
+func resolveDefaultConfigDir() (string, error) {
+	if configDir, err := os.UserConfigDir(); err == nil && configDir != "" {
+		return filepath.Join(configDir, "reviewbot"), nil
+	}
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		return "", err
+	}
+	return filepath.Join(homeDir, defaultConfigDir), nil
 }
