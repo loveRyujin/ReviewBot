@@ -9,6 +9,7 @@ import (
 	"github.com/fatih/color"
 	"github.com/loveRyujin/ReviewBot/pkg/config"
 	"github.com/loveRyujin/ReviewBot/pkg/version"
+	"github.com/loveRyujin/ReviewBot/prompt"
 	"github.com/spf13/cobra"
 )
 
@@ -70,7 +71,12 @@ func initConfig() error {
 		EnvPrefix:    defaultEnvPrefix,
 		Replacer:     replacer,
 	})
-	return err
+	if err != nil {
+		return err
+	}
+
+	prompt.SetTemplateDir(globalConfig.Prompt.Folder)
+	return nil
 }
 
 // searchDirs returns the directories to search for the config file.

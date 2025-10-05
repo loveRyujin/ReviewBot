@@ -8,3 +8,6 @@ dist/
 
 # vhs
 reviewbot.tape
+
+# Local config overrides
+config/
