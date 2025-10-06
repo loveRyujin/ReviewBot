@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"fmt"
 	"html"
 
 	"github.com/erikgeiser/promptkit/confirmation"
@@ -42,6 +43,14 @@ var commitCmd = &cobra.Command{
 		diff, err := g.DiffFiles()
 		if err != nil {
 			return err
+		}
+
+		maxInputSize := globalConfig.Git.MaxInputSize
+		if maxInputSize <= 0 {
+			return fmt.Errorf("invalid max_input_size: %d", maxInputSize)
+		}
+		if len(diff) >= maxInputSize {
+			return fmt.Errorf("git diff input size (%d bytes) exceeds limit (%d). adjust --max_input_size or split changes", len(diff), maxInputSize)
 		}
 
 		currentModel := globalConfig.AI.Model
