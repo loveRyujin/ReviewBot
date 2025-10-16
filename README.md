@@ -179,3 +179,6 @@ reviewbot commit --output_lang=zh-cn
 如果网络环境无法直接访问某些大模型的 API，可参考 `config/reviewbot.yaml` 的示例，在对应路径配置自定义 `base_url`。
 
 推荐使用 [openrouter](https://openrouter.ai/)。
+
+## 项目改进计划
+查看 [TODO.md](./TODO.md) 了解项目的改进计划和开发路线图。欢迎贡献代码或提出建议！
