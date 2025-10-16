@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"fmt"
 	"html"
 
 	"github.com/erikgeiser/promptkit/confirmation"
@@ -16,6 +17,7 @@ var (
 	diffUnifiedLines int
 	excludedList     []string
 	amend            bool
+	autoStage        bool
 )
 
 func init() {
@@ -24,6 +26,7 @@ func init() {
 	commitCmd.PersistentFlags().StringArrayVar(&excludedList, "exclude_list", []string{}, "list of files to exclude from review")
 	commitCmd.PersistentFlags().BoolVar(&amend, "amend", false, "amend the commit message")
 	commitCmd.PersistentFlags().StringVar(&outputLang, "output_lang", "en", "output language of the commit message(default: English)")
+	commitCmd.PersistentFlags().BoolVar(&autoStage, "auto_stage", false, "automatically run 'git add .' before generating the commit message")
 }
 
 // commitCmd is a Cobra command that automates the generation of commit messages
@@ -37,11 +40,39 @@ var commitCmd = &cobra.Command{
 		applyCommitOverrides()
 	},
 	RunE: func(cmd *cobra.Command, args []string) error {
-		// generate diff info
 		g := globalConfig.GitCommandConfig().New()
+
+		if autoStage {
+			// Allow staging all changes before generating the commit message.
+			color.Red("⚠️ Running 'git add .' will stage all modifications in the repository.")
+			proceed, err := confirmation.New("Continue with auto staging all changes?", confirmation.No).RunPrompt()
+			if err != nil {
+				return err
+			}
+			if !proceed {
+				color.Yellow("Auto staging cancelled. Please stage changes manually and retry.")
+				return nil
+			}
+
+			color.Cyan("Running git add . ...")
+			if _, err := g.Add("."); err != nil {
+				return err
+			}
+			color.Green("git add . completed")
+		}
+
+		// generate diff info
 		diff, err := g.DiffFiles()
 		if err != nil {
 			return err
+		}
+
+		maxInputSize := globalConfig.Git.MaxInputSize
+		if maxInputSize <= 0 {
+			return fmt.Errorf("invalid max_input_size: %d", maxInputSize)
+		}
+		if len(diff) >= maxInputSize {
+			return fmt.Errorf("git diff input size (%d bytes) exceeds limit (%d). adjust --max_input_size or split changes", len(diff), maxInputSize)
 		}
 
 		currentModel := globalConfig.AI.Model
@@ -157,5 +188,11 @@ func applyCommitOverrides() {
 	}
 	if preview {
 		globalConfig.Runtime.Commit.Preview = true
+	}
+	if aiProviderFlag != "" {
+		globalConfig.AI.Provider = aiProviderFlag
+	}
+	if aiModelFlag != "" {
+		globalConfig.AI.Model = aiModelFlag
 	}
 }

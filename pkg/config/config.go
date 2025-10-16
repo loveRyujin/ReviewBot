@@ -27,7 +27,13 @@ type Config struct {
 	Git     GitConfig     `mapstructure:"git"`
 	AI      AIConfig      `mapstructure:"ai"`
 	Proxy   ProxyConfig   `mapstructure:"proxy"`
+	Prompt  PromptConfig  `mapstructure:"prompt"`
 	Runtime RuntimeConfig `mapstructure:"runtime"`
+}
+
+// PromptConfig defines settings related to prompt templates.
+type PromptConfig struct {
+	Folder string `mapstructure:"folder"`
 }
 
 // GitConfig contains git-related options.
@@ -100,6 +106,7 @@ func NewDefault() *Config {
 			PresencePenalty:  0.5,
 			FrequencyPenalty: 0.5,
 		},
+		Prompt: PromptConfig{},
 		Proxy: ProxyConfig{
 			Timeout: defaultTimeout,
 		},
@@ -122,4 +129,6 @@ func setDefaults(v *viper.Viper) {
 	v.SetDefault("ai.frequency_penalty", 0.5)
 
 	v.SetDefault("proxy.timeout", defaultTimeout)
+
+	v.SetDefault("prompt.folder", "")
 }

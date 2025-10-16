@@ -71,4 +71,12 @@ endif
 install: build
 	$(GO) install -ldflags "$(GO_LDFLAGS)" ./cmd/$(EXECUTABLE)
 
-.PHONY: build build_linux_amd64 build_linux_arm64 build_linux_arm build_mac_intel build_windows_64 install
+## test: run all unit tests
+test:
+	$(GO) test ./...
+
+## test-cover: run all unit tests with coverage report
+test-cover:
+	$(GO) test -cover ./...
+
+.PHONY: build build_linux_amd64 build_linux_arm64 build_linux_arm build_mac_intel build_windows_64 install test test-cover

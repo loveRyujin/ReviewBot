@@ -1,10 +1,12 @@
 package git
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"os/exec"
 	"strconv"
+	"strings"
 )
 
 var excludeFromDiff = []string{
@@ -89,10 +91,31 @@ var excludeFromDiff = []string{
 	"**/*.swo",
 }
 
+// Command wraps git operations used by ReviewBot.
+// It encapsulates default diff settings, exclusion patterns, and amend mode.
 type Command struct {
 	diffUnified  int
 	excludedList []string
 	isAmend      bool
+}
+
+// run executes a git command and returns trimmed stdout or an error with stderr.
+func run(args ...string) (string, error) {
+	if len(args) == 0 {
+		return "", errors.New("no git command provided")
+	}
+
+	cmd := exec.Command("git", args...)
+	var stdout bytes.Buffer
+	var stderr bytes.Buffer
+	cmd.Stdout = &stdout
+	cmd.Stderr = &stderr
+
+	if err := cmd.Run(); err != nil {
+		return "", fmt.Errorf("git %s: %w: %s", strings.Join(args, " "), err, strings.TrimSpace(stderr.String()))
+	}
+
+	return strings.TrimSpace(stdout.String()), nil
 }
 
 // excludedFiles returns a list of file paths prefixed with ":(exclude,top)",
@@ -105,9 +128,8 @@ func (cmd *Command) excludedFiles() []string {
 	return excludedFiles
 }
 
-// diffName constructs and returns a git command to list file names that have been changed.
-// It supports both staged changes and amendments, and allows excluding specific files.
-func (cmd *Command) diffName() *exec.Cmd {
+// diffNameArgs builds the git diff command (name-only) with exclusions applied.
+func (cmd *Command) diffNameArgs() []string {
 	args := []string{
 		"diff",
 		"--name-only",
@@ -122,18 +144,11 @@ func (cmd *Command) diffName() *exec.Cmd {
 	excludedFiles := cmd.excludedFiles()
 	args = append(args, excludedFiles...)
 
-	return exec.Command(
-		"git",
-		args...,
-	)
+	return args
 }
 
-// diffFiles constructs and returns an *exec.Cmd to execute a Git diff command.
-// It supports generating diffs for staged changes or between the last commit
-// and its parent (in case of an amend). The method also applies options such as
-// ignoring whitespace changes, using a minimal diff algorithm, and excluding
-// specified files.
-func (cmd *Command) diffFiles() *exec.Cmd {
+// diffFilesArgs builds git diff arguments with ReviewBot defaults.
+func (cmd *Command) diffFilesArgs() []string {
 	args := []string{
 		"diff",
 		"--ignore-all-space",
@@ -150,15 +165,11 @@ func (cmd *Command) diffFiles() *exec.Cmd {
 	excludedFiles := cmd.excludedFiles()
 	args = append(args, excludedFiles...)
 
-	return exec.Command(
-		"git",
-		args...,
-	)
+	return args
 }
 
-// commit constructs a git commit command with the provided commit message.
-// It includes the --signoff flag and optionally the --amend flag if cmd.isAmend is true.
-func (cmd *Command) commit(msg string) *exec.Cmd {
+// commitArgs builds git commit arguments (always signoff, optional amend).
+func (cmd *Command) commitArgs(msg string) []string {
 	args := []string{
 		"commit",
 		"--signoff",
@@ -169,40 +180,43 @@ func (cmd *Command) commit(msg string) *exec.Cmd {
 		args = append(args, "--amend")
 	}
 
-	return exec.Command(
-		"git",
-		args...,
-	)
+	return args
 }
 
-// Commit executes a git commit with the provided message and returns the output.
-// If there are no staged changes, it returns an error prompting the user to stage files.
+// Commit runs git commit and returns stdout. It errors if nothing is staged.
 func (cmd *Command) Commit(msg string) (string, error) {
-	output, err := cmd.commit(msg).Output()
+	output, err := run(cmd.commitArgs(msg)...)
 	if err != nil {
 		return "", err
 	}
-	if len(output) == 0 {
+	if output == "" {
 		return "", errors.New("please add your staged changes using git add <files...>")
 	}
 
-	return string(output), nil
+	return output, nil
 }
 
+// DiffFiles returns the staged diff (or HEAD^ vs HEAD when amending).
 func (cmd *Command) DiffFiles() (string, error) {
-	output, err := cmd.diffName().Output()
+	names, err := run(cmd.diffNameArgs()...)
 	if err != nil {
 		return "", err
 	}
-	if len(output) == 0 {
+	if names == "" {
 		return "", errors.New("please add your staged changes using git add <files...>")
 	}
 
-	output, err = cmd.diffFiles().Output()
-	if err != nil {
-		return "", err
+	return run(cmd.diffFilesArgs()...)
+}
+
+// Add stages the provided paths using git add. Paths must be non-empty.
+func (cmd *Command) Add(paths ...string) (string, error) {
+	if len(paths) == 0 {
+		return "", errors.New("no paths provided to git add")
 	}
-	return string(output), nil
+
+	args := append([]string{"add"}, paths...)
+	return run(args...)
 }
 
 type Config struct {

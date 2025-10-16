@@ -26,6 +26,7 @@ type Overrides struct {
 	Git    GitOverrides
 	Review ReviewOverrides
 	Commit CommitOverrides
+	Prompt PromptOverrides
 }
 
 // GitOverrides holds CLI overrides for git settings.
@@ -51,6 +52,11 @@ type ReviewOverrides struct {
 type CommitOverrides struct {
 	Preview    *bool
 	OutputLang string
+}
+
+// PromptOverrides allows overriding prompt-related settings via CLI.
+type PromptOverrides struct {
+	Folder string
 }
 
 // Load constructs a Config using defaults, file/env values, and overrides.
@@ -163,6 +169,10 @@ func applyOverrides(cfg *Config, ov Overrides) {
 	}
 	if ov.Commit.OutputLang != "" {
 		cfg.Runtime.Commit.OutputLang = ov.Commit.OutputLang
+	}
+
+	if ov.Prompt.Folder != "" {
+		cfg.Prompt.Folder = ov.Prompt.Folder
 	}
 }
 
