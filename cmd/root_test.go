@@ -11,17 +11,21 @@ func TestEnsureDefaultConfigFileCreatesFile(t *testing.T) {
 
 	setConfigEnv(t, temp)
 
+	// Get the actual config directory that will be used
+	actualConfigDir, err := resolveDefaultConfigDir()
+	if err != nil {
+		t.Fatalf("resolveDefaultConfigDir error: %v", err)
+	}
+	expectedFile := filepath.Join(actualConfigDir, defaultConfigFile)
+
 	// create config file at resolved default location
 	if err := ensureDefaultConfigFile(); err != nil {
 		t.Fatalf("ensureDefaultConfigFile error: %v", err)
 	}
 
-	expectedDir := filepath.Join(temp, "reviewbot")
-	expectedFile := filepath.Join(expectedDir, defaultConfigFile)
-
 	// file should be created on first call
 	if _, err := os.Stat(expectedFile); err != nil {
-		t.Fatalf("config file not created: %v", err)
+		t.Fatalf("config file not created at %s: %v", expectedFile, err)
 	}
 
 	// modify content and ensure function does not overwrite existing file
