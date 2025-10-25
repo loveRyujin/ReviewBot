@@ -3,6 +3,7 @@ package cmd
 import (
 	"os"
 	"path/filepath"
+	"runtime"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -18,14 +19,20 @@ func TestResolveConfigFilePath(t *testing.T) {
 		validate func(t *testing.T, result string)
 	}{
 		{
-			name:     "absolute path",
-			filename: "/etc/reviewbot/config.yaml",
+			name: "absolute path",
+			filename: func() string {
+				if runtime.GOOS == "windows" {
+					return "C:\\etc\\reviewbot\\config.yaml"
+				}
+				return "/etc/reviewbot/config.yaml"
+			}(),
 			setup: func(t *testing.T) string {
 				return ""
 			},
 			wantErr: false,
 			validate: func(t *testing.T, result string) {
-				assert.Equal(t, "/etc/reviewbot/config.yaml", result)
+				assert.True(t, filepath.IsAbs(result))
+				assert.Contains(t, result, "config.yaml")
 			},
 		},
 		{
@@ -42,14 +49,15 @@ func TestResolveConfigFilePath(t *testing.T) {
 		},
 		{
 			name:     "relative path with subdirectory",
-			filename: "subdir/config.yaml",
+			filename: filepath.Join("subdir", "config.yaml"),
 			setup: func(t *testing.T) string {
 				return t.TempDir()
 			},
 			wantErr: false,
 			validate: func(t *testing.T, result string) {
 				assert.True(t, filepath.IsAbs(result))
-				assert.Contains(t, result, "subdir/config.yaml")
+				assert.Contains(t, result, "subdir")
+				assert.Contains(t, result, "config.yaml")
 			},
 		},
 	}
