@@ -1,7 +1,7 @@
 ﻿# ReviewBot
 
 [![Tests](https://github.com/loveRyujin/ReviewBot/actions/workflows/test.yml/badge.svg)](https://github.com/loveRyujin/ReviewBot/actions/workflows/test.yml)
-[![codecov](https://codecov.io/gh/loveRyujin/ReviewBot/branch/main/graph/badge.svg)](https://codecov.io/gh/loveRyujin/ReviewBot)
+[![codecov](https://codecov.io/gh/loveRyujin/ReviewBot/branch/master/graph/badge.svg)](https://codecov.io/gh/loveRyujin/ReviewBot)
 [![Go Report Card](https://goreportcard.com/badge/github.com/loveRyujin/ReviewBot)](https://goreportcard.com/report/github.com/loveRyujin/ReviewBot)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Go Version](https://img.shields.io/github/go-mod/go-version/loveRyujin/ReviewBot)](https://github.com/loveRyujin/ReviewBot)
