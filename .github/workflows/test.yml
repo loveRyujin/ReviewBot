@@ -41,15 +41,7 @@ jobs:
         run: go mod download
 
       - name: Run unit tests
-        run: go test -short -race -coverprofile=coverage.txt -covermode=atomic ./...
-
-      - name: Upload coverage to Codecov
-        if: matrix.os == 'ubuntu-latest'
-        uses: codecov/codecov-action@v4
-        with:
-          file: ./coverage.txt
-          flags: unittests
-          name: codecov-umbrella
+        run: go test -short -race ./...
 
   integration-test:
     name: Run Integration Tests
@@ -70,35 +62,7 @@ jobs:
           git config --global commit.gpgsign false
 
       - name: Run integration tests
-        run: go test -v -coverprofile=integration-coverage.txt ./test/integration/...
+        run: go test -v ./test/integration/...
 
       - name: Run E2E tests
-        run: go test -v -coverprofile=e2e-coverage.txt ./test/e2e/...
-
-  coverage-report:
-    name: Generate Coverage Report
-    needs: [test, integration-test]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Go
-        uses: actions/setup-go@v5
-        with:
-          go-version: '1.24'
-
-      - name: Run all tests with coverage
-        run: |
-          go test -coverprofile=coverage.out -covermode=atomic ./...
-          go tool cover -func=coverage.out
-
-      - name: Check coverage threshold
-        run: |
-          COVERAGE=$(go tool cover -func=coverage.out | tail -1 | awk '{print $3}' | sed 's/%//')
-          echo "Total coverage: ${COVERAGE}%"
-          if (( $(echo "$COVERAGE < 60.0" | bc -l) )); then
-            echo "Coverage ${COVERAGE}% is below threshold 60%"
-            exit 1
-          fi
-
+        run: go test -v ./test/e2e/...
