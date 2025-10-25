@@ -1,5 +1,11 @@
 ﻿# ReviewBot
 
+[![Tests](https://github.com/loveRyujin/ReviewBot/actions/workflows/test.yml/badge.svg)](https://github.com/loveRyujin/ReviewBot/actions/workflows/test.yml)
+[![codecov](https://codecov.io/gh/loveRyujin/ReviewBot/branch/main/graph/badge.svg)](https://codecov.io/gh/loveRyujin/ReviewBot)
+[![Go Report Card](https://goreportcard.com/badge/github.com/loveRyujin/ReviewBot)](https://goreportcard.com/report/github.com/loveRyujin/ReviewBot)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Go Version](https://img.shields.io/github/go-mod/go-version/loveRyujin/ReviewBot)](https://github.com/loveRyujin/ReviewBot)
+[![GitHub release](https://img.shields.io/github/release/loveRyujin/ReviewBot.svg)](https://github.com/loveRyujin/ReviewBot/releases)
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/loveRyujin/ReviewBot)
 
 一个人工智能驱动的命令行工具，根据 Git 仓库里的变更帮助开发人员生成 commit message、执行 code review 等日常工作。
@@ -182,3 +188,6 @@ reviewbot commit --output_lang=zh-cn
 
 ## 项目改进计划
 查看 [TODO.md](./TODO.md) 了解项目的改进计划和开发路线图。欢迎贡献代码或提出建议！
+
+## 许可证
+本项目采用 MIT 许可证。详情请查看 [LICENSE](./LICENSE) 文件。

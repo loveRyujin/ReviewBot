@@ -41,7 +41,15 @@ jobs:
         run: go mod download
 
       - name: Run unit tests
-        run: go test -short -race ./...
+        run: go test -short -race -coverprofile=coverage.txt -covermode=atomic ./...
+
+      - name: Upload coverage to Codecov
+        if: matrix.os == 'ubuntu-latest'
+        uses: codecov/codecov-action@v4
+        with:
+          file: ./coverage.txt
+          flags: unittests
+          fail_ci_if_error: false
 
   integration-test:
     name: Run Integration Tests

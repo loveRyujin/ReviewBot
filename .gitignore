@@ -17,6 +17,9 @@ coverage.html
 *.coverage.txt
 *.coverprofile
 
+# Codecov
+codecov.yml
+
 # Dependency directories
 vendor/
 
