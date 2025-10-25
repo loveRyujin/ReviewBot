@@ -68,3 +68,17 @@ func TestInfo_Text(t *testing.T) {
 	assert.Contains(t, stringOutput, "compiler: "+info.Compiler)
 	assert.Contains(t, stringOutput, "platform: "+info.Platform)
 }
+
+func TestInfo_AllMethods(t *testing.T) {
+	// Test with actual Get() function
+	info := Get()
+
+	// Ensure all methods work
+	assert.NotEmpty(t, info.String())
+	assert.NotEmpty(t, info.ToJSON())
+	assert.NotEmpty(t, info.Text())
+
+	// Verify JSON is valid
+	assert.Contains(t, info.ToJSON(), "gitVersion")
+	assert.Contains(t, info.ToJSON(), "goVersion")
+}

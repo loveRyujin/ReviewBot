@@ -1,12 +1,69 @@
+# Binaries for programs and plugins
 bin/
-
 *.exe
 *.exe~
+*.dll
+*.so
+*.dylib
 
-# Added by goreleaser init:
+# Test binary, built with `go test -c`
+*.test
+
+# Output of the go coverage tool
+coverage.out
+coverage.txt
+coverage.html
+*.coverage.out
+*.coverage.txt
+*.coverprofile
+
+# Codecov
+codecov.yml
+
+# Dependency directories
+vendor/
+
+# Go workspace file
+go.work
+go.work.sum
+
+# Added by goreleaser init
 dist/
 
-# vhs
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# IDEs and editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+*.sublime-project
+*.sublime-workspace
+
+# Debugging
+__debug_bin
+debug
+*.pprof
+
+# Temporary files
+*.tmp
+*.temp
+*.log
+*.pid
+*.seed
+*.pid.lock
+
+# Build artifacts
+*.out
+tmp/
+temp/
+
+# VHS
 reviewbot.tape
 
 # Local config overrides
