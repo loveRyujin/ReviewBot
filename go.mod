@@ -18,7 +18,7 @@ require (
 	github.com/spf13/viper v1.21.0
 	github.com/stretchr/testify v1.11.1
 	golang.org/x/net v0.46.0
-	google.golang.org/genai v1.34.0
+	google.golang.org/genai v1.36.0
 	gopkg.in/yaml.v3 v3.0.1
 )
 
