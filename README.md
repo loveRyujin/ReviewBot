@@ -211,6 +211,10 @@ We recommend using [openrouter](https://openrouter.ai/).
 
 Check out [TODO.md](./TODO.md) to learn about the project's improvement plans and development roadmap. Contributions and suggestions are welcome!
 
+## Acknowledgments
+
+This project is inspired by and references [appleboy/CodeGPT](https://github.com/appleboy/CodeGPT). CodeGPT is a command-line tool written in Go that uses ChatGPT AI (such as gpt-4o, gpt-4-turbo, gpt-3.5-turbo models) to automatically generate Git commit messages or perform code review summaries, and automatically installs git prepare-commit-msg hooks.
+
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](./LICENSE) file for details.

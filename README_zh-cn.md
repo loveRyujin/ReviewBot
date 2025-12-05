@@ -190,5 +190,9 @@ reviewbot commit --output_lang=zh-cn
 ## 项目改进计划
 查看 [TODO.md](./TODO.md) 了解项目的改进计划和开发路线图。欢迎贡献代码或提出建议！
 
+## 致谢
+
+本项目参考了 [appleboy/CodeGPT](https://github.com/appleboy/CodeGPT) 的设计和实现。CodeGPT 是一个使用 Go 语言编写的命令行工具，利用 ChatGPT AI（如 gpt-4o、gpt-4-turbo、gpt-3.5-turbo 模型）自动生成 Git 提交信息或进行代码审查摘要，并自动安装 git prepare-commit-msg 钩子。
+
 ## 许可证
 本项目采用 MIT 许可证。详情请查看 [LICENSE](./LICENSE) 文件。
