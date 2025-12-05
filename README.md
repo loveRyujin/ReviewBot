@@ -153,7 +153,6 @@ reviewbot review
 reviewbot config list
 ```
 Configuration list display:
-![config_list](./images/config_list.png)
 ![review_config_list](./images/review_config_list.gif)
 
 ### Update Configuration

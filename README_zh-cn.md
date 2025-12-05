@@ -138,7 +138,6 @@ reviewbot review
 reviewbot config list
 ```
 可选配置展示：
-![config_list](./images/config_list.png)
 ![review_config_list](./images/review_config_list.gif)
 
 ### 更新配置
