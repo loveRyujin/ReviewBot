@@ -1,6 +1,6 @@
 module github.com/loveRyujin/ReviewBot
 
-go 1.24.2
+go 1.25.0
 
 require (
 	github.com/briandowns/spinner v1.23.2
@@ -17,7 +17,7 @@ require (
 	github.com/spf13/pflag v1.0.10
 	github.com/spf13/viper v1.21.0
 	github.com/stretchr/testify v1.11.1
-	golang.org/x/net v0.50.0
+	golang.org/x/net v0.51.0
 	google.golang.org/genai v1.47.0
 	gopkg.in/yaml.v3 v3.0.1
 )
