@@ -36,15 +36,18 @@ func (c *customTransport) RoundTrip(req *http.Request) (*http.Response, error) {
 func toHTTPHeaders(headers []string) http.Header {
 	httpHeaders := make(http.Header)
 	for _, header := range headers {
-		parts := strings.SplitN(header, "=", 2)
-		if len(parts) == 2 {
-			key := strings.TrimSpace(parts[0])
-			value := strings.TrimSpace(parts[1])
-			if key == "" || value == "" {
-				continue // Skip empty keys or values
-			}
-			httpHeaders.Add(key, value)
+		key, value, ok := strings.Cut(header, "=")
+		if !ok {
+			continue
 		}
+
+		key = strings.TrimSpace(key)
+		value = strings.TrimSpace(value)
+		if key == "" || value == "" {
+			continue // Skip empty keys or values
+		}
+
+		httpHeaders.Add(key, value)
 	}
 
 	return httpHeaders

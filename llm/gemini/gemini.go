@@ -98,14 +98,14 @@ type Config struct {
 	TopP        float32
 }
 
-func (cfg *Config) New(proxyCfg *proxy.Config) (*Client, error) {
+func (cfg *Config) New(ctx context.Context, proxyCfg *proxy.Config) (*Client, error) {
 	httpClient, _ := proxyCfg.New()
 	httpOption := genai.HTTPOptions{}
 	if cfg.BaseURL != "" {
 		httpOption.BaseURL = cfg.BaseURL
 	}
 
-	client, err := genai.NewClient(context.Background(), &genai.ClientConfig{
+	client, err := genai.NewClient(ctx, &genai.ClientConfig{
 		HTTPClient:  httpClient,
 		HTTPOptions: httpOption,
 		APIKey:      cfg.ApiKey,

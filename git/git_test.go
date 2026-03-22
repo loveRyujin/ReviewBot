@@ -92,6 +92,18 @@ func TestCommandCommit(t *testing.T) {
 	}
 }
 
+func TestConfigNewClonesDefaultExcludeList(t *testing.T) {
+	first := (&Config{DiffUnified: 3, ExcludedList: []string{"custom-a"}}).New()
+	second := (&Config{DiffUnified: 3, ExcludedList: []string{"custom-b"}}).New()
+
+	if strings.Contains(strings.Join(first.excludedList, ","), "custom-b") {
+		t.Fatalf("first command exclude list should not be affected by later configs: %v", first.excludedList)
+	}
+	if strings.Contains(strings.Join(second.excludedList, ","), "custom-a") {
+		t.Fatalf("second command exclude list should not contain earlier config values: %v", second.excludedList)
+	}
+}
+
 // setupRepo initializes a temporary git repository for testing.
 func setupRepo(t *testing.T) {
 	t.Helper()

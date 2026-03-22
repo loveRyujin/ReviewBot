@@ -1,7 +1,8 @@
 package cmd
 
 import (
-	"sort"
+	"maps"
+	"slices"
 
 	"github.com/fatih/color"
 	"github.com/rodaine/table"
@@ -58,13 +59,7 @@ var configListCmd = &cobra.Command{
 		tbl := table.New("Config Name", "Value", "Description")
 		tbl.WithHeaderFormatter(headerFmt).WithFirstColumnFormatter(columnFmt)
 
-		// Sort the keys
-		keys := make([]string, 0, len(availableKeys))
-		for key := range availableKeys {
-			keys = append(keys, key)
-		}
-
-		sort.Strings(keys)
+		keys := slices.Sorted(maps.Keys(availableKeys))
 
 		// Add the key and value to the table
 		for _, v := range keys {

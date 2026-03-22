@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"context"
 	"errors"
 
 	"github.com/loveRyujin/ReviewBot/ai"
@@ -18,12 +19,12 @@ func NewDeepSeekClient() (*openai.Client, error) {
 	return globalConfig.DeepSeekConfig().New(proxyCfg)
 }
 
-func NewGeminiClient() (*gemini.Client, error) {
+func NewGeminiClient(ctx context.Context) (*gemini.Client, error) {
 	proxyCfg := globalConfig.ProxyConfig()
-	return globalConfig.GeminiConfig().New(proxyCfg)
+	return globalConfig.GeminiConfig().New(ctx, proxyCfg)
 }
 
-func GetModelClient(provider ai.Provider) (ai.TextGenerator, error) {
+func GetModelClient(ctx context.Context, provider ai.Provider) (ai.TextGenerator, error) {
 	switch provider {
 	case ai.OpenAI:
 		return NewOpenAIClient()
@@ -32,7 +33,7 @@ func GetModelClient(provider ai.Provider) (ai.TextGenerator, error) {
 	case ai.DeepSeek:
 		return NewDeepSeekClient()
 	case ai.Gemini:
-		return NewGeminiClient()
+		return NewGeminiClient(ctx)
 	default:
 		return nil, errors.New("unsupported LLM provider")
 	}

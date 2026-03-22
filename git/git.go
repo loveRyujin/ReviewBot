@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"os/exec"
+	"slices"
 	"strconv"
 	"strings"
 )
@@ -121,9 +122,9 @@ func run(args ...string) (string, error) {
 // excludedFiles returns a list of file paths prefixed with ":(exclude,top)",
 // representing files to be excluded based on the command's excluded list.
 func (cmd *Command) excludedFiles() []string {
-	excludedFiles := make([]string, 0, len(cmd.excludedList))
-	for _, file := range cmd.excludedList {
-		excludedFiles = append(excludedFiles, ":(exclude,top)"+file)
+	excludedFiles := make([]string, len(cmd.excludedList))
+	for i := range len(cmd.excludedList) {
+		excludedFiles[i] = ":(exclude,top)" + cmd.excludedList[i]
 	}
 	return excludedFiles
 }
@@ -230,7 +231,7 @@ type Config struct {
 func (cfg *Config) New() *Command {
 	command := &Command{
 		diffUnified:  cfg.DiffUnified,
-		excludedList: append(excludeFromDiff, cfg.ExcludedList...),
+		excludedList: append(slices.Clone(excludeFromDiff), cfg.ExcludedList...),
 		isAmend:      cfg.IsAmend,
 	}
 

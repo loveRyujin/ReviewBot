@@ -77,7 +77,7 @@ var commitCmd = &cobra.Command{
 
 		currentModel := globalConfig.AI.Model
 		provider := ai.Provider(globalConfig.AI.Provider)
-		client, err := GetModelClient(provider)
+		client, err := GetModelClient(cmd.Context(), provider)
 		if err != nil {
 			return err
 		}

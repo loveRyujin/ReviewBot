@@ -56,7 +56,7 @@ var reviewCmd = &cobra.Command{
 		}
 
 		aiProvider := ai.Provider(globalConfig.AI.Provider)
-		aiModelClient, err := GetModelClient(aiProvider)
+		aiModelClient, err := GetModelClient(cmd.Context(), aiProvider)
 		if err != nil {
 			return err
 		}
@@ -163,7 +163,7 @@ func executeReview(ctx context.Context, client ai.TextGenerator, reviewPrompt st
 }
 
 // streamOutput streams AI-generated review output in real-time with colored formatting and token usage stats.
-func streamOutput(ctx context.Context, client ai.TextGenerator, reviewPrompt string, colorF func(format string, a ...interface{})) error {
+func streamOutput(ctx context.Context, client ai.TextGenerator, reviewPrompt string, colorF func(format string, a ...any)) error {
 	chunkHandler := func(chunk string) error {
 		colorF(chunk)
 		return nil
@@ -177,7 +177,7 @@ func streamOutput(ctx context.Context, client ai.TextGenerator, reviewPrompt str
 }
 
 // streamTranslation streams the translation of a code review summary into the specified language using the AI client and colored output.
-func streamTranslation(ctx context.Context, client ai.TextGenerator, content string, lang string, colorF func(format string, a ...interface{})) error {
+func streamTranslation(ctx context.Context, client ai.TextGenerator, content string, lang string, colorF func(format string, a ...any)) error {
 	instruction, err := prompt.GetPromptTmpl(prompt.TranslationTmpl, map[string]any{
 		prompt.OutputLang:    lang,
 		prompt.OutputMessage: content,

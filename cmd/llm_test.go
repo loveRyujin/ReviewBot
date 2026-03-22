@@ -62,7 +62,7 @@ func TestGetModelClient(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			client, err := GetModelClient(tt.provider)
+			client, err := GetModelClient(t.Context(), tt.provider)
 			if tt.wantErr {
 				assert.Error(t, err)
 				assert.Contains(t, err.Error(), "unsupported LLM provider")
@@ -127,7 +127,7 @@ func TestNewGeminiClient(t *testing.T) {
 		Proxy: config.ProxyConfig{},
 	}
 
-	client, err := NewGeminiClient()
+	client, err := NewGeminiClient(t.Context())
 	assert.NoError(t, err)
 	assert.NotNil(t, client)
 }
