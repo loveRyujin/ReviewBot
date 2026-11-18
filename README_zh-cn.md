@@ -71,7 +71,7 @@ Use "reviewbot [command] --help" for more information about a command.
 ## 使用方法
 ### 配置方式
 - 命令行参数（使用 `-h` 或 `--help` 查看各命令的参数）。
-- 全局参数 、 可以在命令行覆盖当前会话的模型提供方与模型，优先级高于配置文件与环境变量。
+- 全局参数 `--ai-provider` 和 `--ai-model` 可以在命令行覆盖当前会话的模型提供方与模型，优先级高于配置文件与环境变量。
 - 环境变量（以 `REVIEWBOT` 为前缀，使用 `_` 连接，例如 `REVIEWBOT_AI_BASE_URL` 对应配置项 `ai.base_url`）。
 - YAML 配置文件（按优先级从低到高依次读取：`~/.config/reviewbot/reviewbot.yaml`、项目根目录、根目录下的 `config` 目录）。
 - 运行 `reviewbot init` 命令，根据引导输入配置，系统会在默认路径 `~/.config/reviewbot/reviewbot.yaml` 生成配置文件。
@@ -96,6 +96,27 @@ Below is the code patch, please provide feedback:
 - `{{ .summary_points }}`：模型生成的文件级摘要列表，常用于后续提炼 commit 信息。
 - `{{ .output_language }}`：目标输出语言标识（例如 `en`、`zh-cn`）。
 - `{{ .output_message }}`：待翻译的原始文本内容。
+
+### Anthropic（Claude）
+
+将以下内容保存为 `reviewbot.yaml`，选择账户可用的模型，并在环境变量 `REVIEWBOT_AI_API_KEY` 中设置密钥。请保留 YAML 中的 `api_key` 字段，以便配置加载器读取环境变量的覆盖值。
+
+```yaml
+ai:
+  provider: anthropic
+  api_key: ""
+  model: claude-sonnet-4-6
+  max_tokens: 2048
+```
+
+以下命令分别运行普通审查和流式审查。
+
+```sh
+reviewbot --config reviewbot.yaml review
+reviewbot --config reviewbot.yaml review --stream
+```
+
+默认端点为 `https://api.anthropic.com/v1/messages`。使用兼容 Messages API 的网关时，将 `ai.base_url` 设置为网关基础地址，末尾可带 `/v1`。客户端复用现有的 `proxy` 配置，并使用模型默认的采样参数，以兼容不同 Claude 模型。[Anthropic Messages API 文档](https://platform.claude.com/docs/en/build-with-claude/working-with-messages)
 
 ### 查看版本
 展示语义化版本：

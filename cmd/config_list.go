@@ -31,7 +31,7 @@ var availableKeys = map[string]string{
 	"ai.timeout":           "Maximum duration to wait for API response",
 	"ai.max_tokens":        "Maximum token limit for generated completions",
 	"ai.temperature":       "Randomness control parameter (0-1): lower values for focused results, higher for creative variety",
-	"ai.provider":          "Service provider selection ('openai' or 'azure')",
+	"ai.provider":          "Service provider selection (openai, deepseek, gemini, anthropic)",
 	"ai.skip_verify":       "Option to bypass TLS certificate verification",
 	"ai.headers":           "Additional custom HTTP headers for API requests",
 	"ai.top_p":             "Nucleus sampling parameter: controls diversity by limiting to top percentage of probability mass",

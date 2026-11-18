@@ -2,6 +2,7 @@ package config
 
 import (
 	"github.com/loveRyujin/ReviewBot/git"
+	"github.com/loveRyujin/ReviewBot/llm/anthropic"
 	"github.com/loveRyujin/ReviewBot/llm/gemini"
 	"github.com/loveRyujin/ReviewBot/llm/openai"
 	"github.com/loveRyujin/ReviewBot/proxy"
@@ -41,6 +42,16 @@ func (c *Config) DeepSeekConfig() *openai.Config {
 		TopP:             c.AI.TopP,
 		PresencePenalty:  c.AI.PresencePenalty,
 		FrequencyPenalty: c.AI.FrequencyPenalty,
+	}
+}
+
+// AnthropicConfig maps shared settings to the Messages API.
+func (c *Config) AnthropicConfig() *anthropic.Config {
+	return &anthropic.Config{
+		BaseURL:   c.AI.BaseURL,
+		APIKey:    c.AI.APIKey,
+		Model:     c.AI.Model,
+		MaxTokens: c.AI.MaxTokens,
 	}
 }
 

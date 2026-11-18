@@ -7,13 +7,13 @@
 ReviewBot 是一个 AI 驱动的命令行工具，主要功能包括：
 - 自动生成 commit message
 - 代码审查（code review）
-- 支持多种 AI Provider（OpenAI、DeepSeek、Gemini）
+- 支持多种 AI Provider（OpenAI、DeepSeek、Gemini、Anthropic）
 - 支持流式输出和多语言翻译
 
 ## ❗ 当前存在的问题
 
 ### 1. 代码架构问题
-- ✅ Anthropic Provider 定义但未实现（`cmd/llm.go:31` 返回 nil）
+- ✅ Anthropic Provider 已接入 Messages API
 - ❌ 全局配置变量 `globalConfig` 在 `cmd/root.go` 中，不够优雅，应该通过依赖注入
 - ❌ `cmd` 包中文件过多（11 个文件），命令逻辑和业务逻辑耦合严重
 - ❌ LLM client 创建逻辑散落在 `cmd/llm.go`，应该抽取到独立的 factory 包
@@ -82,11 +82,11 @@ ReviewBot 是一个 AI 驱动的命令行工具，主要功能包括：
 - [x] **T1.6**: 添加 CI workflow 运行测试并生成覆盖率报告
 
 #### 2. 实现 Anthropic Provider
-- [ ] **T2.1**: 创建 `llm/anthropic` 包
-- [ ] **T2.2**: 实现 `anthropic.Client` 和 `ChatCompletion` 方法
-- [ ] **T2.3**: 实现 `StreamChatCompletion` 方法
-- [ ] **T2.4**: 添加配置映射和初始化逻辑
-- [ ] **T2.5**: 添加单元测试和文档
+- [x] **T2.1**: 创建 `llm/anthropic` 包
+- [x] **T2.2**: 实现 `anthropic.Client` 和 `ChatCompletion` 方法
+- [x] **T2.3**: 实现 `StreamChatCompletion` 方法
+- [x] **T2.4**: 添加配置映射和初始化逻辑
+- [x] **T2.5**: 添加单元测试和文档
 
 #### 3. 添加结构化日志系统
 - [ ] **T3.1**: 引入日志库（推荐 `zap` 或 `slog`）
