@@ -40,14 +40,9 @@ func init() {
 
 // reviewCmd defines the "review" command for auto-reviewing staged git code changes using AI.
 var reviewCmd = &cobra.Command{
-	Use:   "review",
-	Short: "Auto review code changes in git stage",
-	PreRun: func(cmd *cobra.Command, args []string) {
-		if err := initConfig(); err != nil {
-			cobra.CheckErr(err)
-		}
-		applyReviewOverrides()
-	},
+	Use:     "review",
+	Short:   "Auto review code changes in git stage",
+	PreRunE: loadCommandConfig,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		// generate diff info
 		diff, err := getDiffContent(args)
@@ -81,8 +76,8 @@ func getDiffContent(args []string) (string, error) {
 	var gitDiffContent string
 	var err error
 
-	switch mode {
-	case ModeLocal:
+	switch globalConfig.Runtime.Review.Mode {
+	case "", ModeLocal:
 		g := globalConfig.GitCommandConfig().New()
 		gitDiffContent, err = g.DiffFiles()
 	case ModeExternal:
@@ -91,12 +86,15 @@ func getDiffContent(args []string) (string, error) {
 				return "", errors.New("git diff input size exceeds limit")
 			}
 			gitDiffContent = args[0]
-		} else if diffFile != "" { // get git diff content from file
+		} else if globalConfig.Git.DiffFile != "" { // get git diff content from file
 			gitDiffContent, err = processFileInput(globalConfig.Git.DiffFile)
 		} else { // get git diff content from stdin
 			gitDiffContent, err = processStdinInput()
 		}
 
+		if err != nil {
+			return "", err
+		}
 		if len(gitDiffContent) == 0 {
 			return "", errors.New("please provide the diff content to review")
 		}
@@ -110,7 +108,7 @@ func getDiffContent(args []string) (string, error) {
 // executeReview perform code review and process output
 func executeReview(ctx context.Context, client ai.TextGenerator, reviewPrompt string, lang string) error {
 	var summary string
-	if stream { // streaming mode
+	if globalConfig.Runtime.Review.Stream { // streaming mode
 		yellow := color.New(color.FgYellow).PrintfFunc()
 
 		if lang != prompt.DefaultLanguage {
@@ -165,7 +163,7 @@ func executeReview(ctx context.Context, client ai.TextGenerator, reviewPrompt st
 // streamOutput streams AI-generated review output in real-time with colored formatting and token usage stats.
 func streamOutput(ctx context.Context, client ai.TextGenerator, reviewPrompt string, colorF func(format string, a ...any)) error {
 	chunkHandler := func(chunk string) error {
-		colorF(chunk)
+		colorF("%s", chunk)
 		return nil
 	}
 
@@ -295,38 +293,4 @@ func checkFileSize(f *os.File) (bool, error) {
 	}
 
 	return true, nil
-}
-
-// applyReviewOverrides applies command-line flags to the global configuration
-func applyReviewOverrides() {
-	if diffUnifiedLines != 3 {
-		globalConfig.Git.DiffUnified = diffUnifiedLines
-	}
-	if len(excludedList) > 0 {
-		globalConfig.Git.ExcludedList = append(globalConfig.Git.ExcludedList, excludedList...)
-	}
-	if amend {
-		globalConfig.Git.Amend = true
-	}
-	if mode != "" {
-		globalConfig.Runtime.Review.Mode = mode
-	}
-	if diffFile != "" {
-		globalConfig.Git.DiffFile = diffFile
-	}
-	if maxInputSize != 20*1024*1024 {
-		globalConfig.Git.MaxInputSize = maxInputSize
-	}
-	if outputLang != "en" {
-		globalConfig.Git.Lang = outputLang
-	}
-	if stream {
-		globalConfig.Runtime.Review.Stream = true
-	}
-	if aiProviderFlag != "" {
-		globalConfig.AI.Provider = aiProviderFlag
-	}
-	if aiModelFlag != "" {
-		globalConfig.AI.Model = aiModelFlag
-	}
 }

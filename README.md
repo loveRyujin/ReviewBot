@@ -74,13 +74,11 @@ Use "reviewbot [command] --help" for more information about a command.
 
 ### Configuration Methods
 
-Configuration priority from lowest to highest:
-- YAML configuration file (in order: `~/.config/reviewbot/reviewbot.yaml`, project root directory, `config/` directory in project root)
-- Environment variables (prefixed with `REVIEWBOT_`, using `_` as separator, e.g., `REVIEWBOT_AI_BASE_URL` maps to `ai.base_url`)
-- Global flags `--provider` and `--model` can override the current session's provider and model, taking precedence over configuration files and environment variables
-- Command-line flags (use `-h` or `--help` to view available options for each command)
+ReviewBot uses the file selected by `--config`. Without that flag it searches `./config/`, the current directory, and the user configuration directory, in that order, for `reviewbot.yaml`. Run `reviewbot init` to create a configuration interactively. Its default location is the `reviewbot` subdirectory of the OS user configuration directory.
 
-Run `reviewbot init` to set up configuration interactively. The system will generate a configuration file at the default path `~/.config/reviewbot/reviewbot.yaml`.
+Environment variables override file settings. For example, `REVIEWBOT_AI_BASE_URL` sets `ai.base_url`. Explicit CLI flags such as `--ai-provider` and `--ai-model` take precedence. Set `runtime.commit.preview`, `runtime.review.mode`, or `runtime.review.stream` to change command defaults. Use `--preview=false` or `--stream=false` to disable an enabled setting for one invocation. The `--output_lang` flag overrides the command's `output_lang` setting and the shared `git.lang` fallback.
+
+`config list` shows the effective settings and masks the API key and custom headers. `config set` updates the selected file and leaves environment overrides out of the file. On first use, `reviewbot --config ./reviewbot.yaml config set ai.api_key "<your-api-key>"` creates the file if needed.
 
 #### Custom Prompt Templates
 

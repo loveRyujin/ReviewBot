@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"context"
-	"errors"
+	"fmt"
 
 	"github.com/loveRyujin/ReviewBot/ai"
 	"github.com/loveRyujin/ReviewBot/llm/gemini"
@@ -28,13 +28,11 @@ func GetModelClient(ctx context.Context, provider ai.Provider) (ai.TextGenerator
 	switch provider {
 	case ai.OpenAI:
 		return NewOpenAIClient()
-	case ai.Anthropic:
-		return nil, nil
 	case ai.DeepSeek:
 		return NewDeepSeekClient()
 	case ai.Gemini:
 		return NewGeminiClient(ctx)
 	default:
-		return nil, errors.New("unsupported LLM provider")
+		return nil, fmt.Errorf("unsupported LLM provider %q (supported: openai, deepseek, gemini)", provider)
 	}
 }

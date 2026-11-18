@@ -26,37 +26,31 @@ func TestGetModelClient(t *testing.T) {
 		name     string
 		provider ai.Provider
 		wantErr  bool
-		wantNil  bool
 	}{
 		{
 			name:     "openai provider",
 			provider: ai.OpenAI,
 			wantErr:  false,
-			wantNil:  false,
 		},
 		{
 			name:     "deepseek provider",
 			provider: ai.DeepSeek,
 			wantErr:  false,
-			wantNil:  false,
 		},
 		{
 			name:     "gemini provider",
 			provider: ai.Gemini,
 			wantErr:  false,
-			wantNil:  false,
 		},
 		{
 			name:     "anthropic provider (not implemented)",
 			provider: ai.Anthropic,
-			wantErr:  false,
-			wantNil:  true, // Returns nil, nil for anthropic
+			wantErr:  true,
 		},
 		{
 			name:     "unsupported provider",
 			provider: ai.Provider("unsupported"),
 			wantErr:  true,
-			wantNil:  false,
 		},
 	}
 
@@ -64,15 +58,12 @@ func TestGetModelClient(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			client, err := GetModelClient(t.Context(), tt.provider)
 			if tt.wantErr {
-				assert.Error(t, err)
-				assert.Contains(t, err.Error(), "unsupported LLM provider")
+				assert.Nil(t, client)
+				assert.ErrorContains(t, err, "unsupported LLM provider")
+				assert.ErrorContains(t, err, tt.provider.String())
 			} else {
 				assert.NoError(t, err)
-				if tt.wantNil {
-					assert.Nil(t, client)
-				} else {
-					assert.NotNil(t, client)
-				}
+				assert.NotNil(t, client)
 			}
 		})
 	}

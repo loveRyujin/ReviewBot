@@ -122,9 +122,11 @@ func (c *Client) StreamChatCompletion(ctx context.Context, text string, handler 
 			return err
 		}
 
-		chunk := resp.Choices[0].Delta.Content
-		if err := handler(chunk); err != nil {
-			return err
+		// The final usage-only event has no choices.
+		if len(resp.Choices) > 0 {
+			if err := handler(resp.Choices[0].Delta.Content); err != nil {
+				return err
+			}
 		}
 
 		if resp.Usage != nil {

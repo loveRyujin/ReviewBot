@@ -8,6 +8,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/fatih/color"
+	"github.com/loveRyujin/ReviewBot/proxy"
 )
 
 var (
@@ -148,12 +149,7 @@ func (m *Model) Timeout() string {
 }
 
 func (m *Model) Headers() []string {
-	headers := m.headers.Value()
-	if headers == "" {
-		return make([]string, 0)
-	}
-
-	return strings.Split(headers, ",")
+	return proxy.ParseHeaders(m.headers.Value())
 }
 
 func (m *Model) SkipVerify() string {
@@ -168,7 +164,8 @@ func checkBox(label string, checked bool) string {
 	return fmt.Sprintf("[ ] %s", label)
 }
 
-func initModel() Model {
+// NewModel creates an empty configuration form.
+func NewModel() Model {
 	// Initialize text input fields for AI configuration
 	provider := textinput.New()
 	provider.Placeholder = "Provider"
@@ -281,7 +278,7 @@ func initModel() Model {
 }
 
 func Run() (*Model, error) {
-	m := initModel()
+	m := NewModel()
 	_, err := tea.NewProgram(&m).Run()
 
 	return &m, err

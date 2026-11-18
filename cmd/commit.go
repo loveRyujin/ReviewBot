@@ -31,14 +31,9 @@ func init() {
 
 // commitCmd is a Cobra command that automates the generation of commit messages
 var commitCmd = &cobra.Command{
-	Use:   "commit",
-	Short: "Automically generate commit message",
-	PreRun: func(cmd *cobra.Command, args []string) {
-		if err := initConfig(); err != nil {
-			cobra.CheckErr(err)
-		}
-		applyCommitOverrides()
-	},
+	Use:     "commit",
+	Short:   "Automically generate commit message",
+	PreRunE: loadCommandConfig,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		g := globalConfig.GitCommandConfig().New()
 
@@ -152,7 +147,7 @@ var commitCmd = &cobra.Command{
 		color.Yellow("\n" + commitOutput + "\n")
 		color.Yellow("==================================================")
 
-		if preview {
+		if globalConfig.Runtime.Commit.Preview {
 			ready, err := confirmation.New("\nWhether to commit this preview message?", confirmation.Yes).RunPrompt()
 			if err != nil {
 				return err
@@ -170,29 +165,4 @@ var commitCmd = &cobra.Command{
 
 		return nil
 	},
-}
-
-// applyCommitOverrides applies command-line flags to the global configuration
-func applyCommitOverrides() {
-	if diffUnifiedLines != 3 {
-		globalConfig.Git.DiffUnified = diffUnifiedLines
-	}
-	if len(excludedList) > 0 {
-		globalConfig.Git.ExcludedList = append(globalConfig.Git.ExcludedList, excludedList...)
-	}
-	if amend {
-		globalConfig.Git.Amend = true
-	}
-	if outputLang != "en" {
-		globalConfig.Git.Lang = outputLang
-	}
-	if preview {
-		globalConfig.Runtime.Commit.Preview = true
-	}
-	if aiProviderFlag != "" {
-		globalConfig.AI.Provider = aiProviderFlag
-	}
-	if aiModelFlag != "" {
-		globalConfig.AI.Model = aiModelFlag
-	}
 }

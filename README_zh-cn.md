@@ -70,11 +70,11 @@ Use "reviewbot [command] --help" for more information about a command.
 
 ## 使用方法
 ### 配置方式
-- 命令行参数（使用 `-h` 或 `--help` 查看各命令的参数）。
-- 全局参数 、 可以在命令行覆盖当前会话的模型提供方与模型，优先级高于配置文件与环境变量。
-- 环境变量（以 `REVIEWBOT` 为前缀，使用 `_` 连接，例如 `REVIEWBOT_AI_BASE_URL` 对应配置项 `ai.base_url`）。
-- YAML 配置文件（按优先级从低到高依次读取：`~/.config/reviewbot/reviewbot.yaml`、项目根目录、根目录下的 `config` 目录）。
-- 运行 `reviewbot init` 命令，根据引导输入配置，系统会在默认路径 `~/.config/reviewbot/reviewbot.yaml` 生成配置文件。
+使用 `--config` 可指定配置文件。省略时，ReviewBot 依次在 `./config/`、当前目录和用户配置目录中查找 `reviewbot.yaml`，使用首个匹配文件。运行 `reviewbot init` 可交互创建配置，其默认位置是操作系统用户配置目录下的 `reviewbot` 子目录。
+
+环境变量会覆盖文件值，例如 `REVIEWBOT_AI_BASE_URL` 对应 `ai.base_url`。显式传入的命令行参数优先级最高，包括 `--ai-provider` 和 `--ai-model`。可在配置中设置 `runtime.commit.preview`、`runtime.review.mode` 和 `runtime.review.stream`，也可通过 `--preview=false` 或 `--stream=false` 临时关闭相应选项。输出语言按 `--output_lang`、当前命令的 `output_lang`、通用的 `git.lang` 依次取值。
+
+`config list` 显示生效的配置，并隐藏 API 密钥和自定义请求头。`config set` 更新选中的文件，环境变量覆盖值仅在运行时生效。首次配置时，可运行 `reviewbot --config ./reviewbot.yaml config set ai.api_key "<你的 API 密钥>"`，文件不存在时会自动创建。
 
 若需要自定义 Prompt，可在配置文件中设置 `prompt.folder`（或通过环境变量 `REVIEWBOT_PROMPT_FOLDER`），该目录中的模板会覆盖内置模板（文件名保持一致）。当前可覆盖的模板文件包括：
 - `code_review_file_diff.tmpl`

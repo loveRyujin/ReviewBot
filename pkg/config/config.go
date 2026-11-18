@@ -24,69 +24,69 @@ var supportedLangs = map[string]struct{}{
 
 // Config holds all application settings grouped by domain.
 type Config struct {
-	Git     GitConfig     `mapstructure:"git"`
-	AI      AIConfig      `mapstructure:"ai"`
-	Proxy   ProxyConfig   `mapstructure:"proxy"`
-	Prompt  PromptConfig  `mapstructure:"prompt"`
-	Runtime RuntimeConfig `mapstructure:"runtime"`
+	Git     GitConfig     `mapstructure:"git" yaml:"git"`
+	AI      AIConfig      `mapstructure:"ai" yaml:"ai"`
+	Proxy   ProxyConfig   `mapstructure:"proxy" yaml:"proxy"`
+	Prompt  PromptConfig  `mapstructure:"prompt" yaml:"prompt"`
+	Runtime RuntimeConfig `mapstructure:"runtime" yaml:"runtime"`
 }
 
 // PromptConfig defines settings related to prompt templates.
 type PromptConfig struct {
-	Folder string `mapstructure:"folder"`
+	Folder string `mapstructure:"folder" yaml:"folder"`
 }
 
 // GitConfig contains git-related options.
 type GitConfig struct {
-	DiffFile     string   `mapstructure:"diff_file"`
-	MaxInputSize int      `mapstructure:"max_input_size"`
-	DiffUnified  int      `mapstructure:"diff_unified"`
-	ExcludedList []string `mapstructure:"exclude_list"`
-	Amend        bool     `mapstructure:"amend"`
-	Lang         string   `mapstructure:"lang"`
+	DiffFile     string   `mapstructure:"diff_file" yaml:"diff_file"`
+	MaxInputSize int      `mapstructure:"max_input_size" yaml:"max_input_size"`
+	DiffUnified  int      `mapstructure:"diff_unified" yaml:"diff_unified"`
+	ExcludedList []string `mapstructure:"exclude_list" yaml:"exclude_list"`
+	Amend        bool     `mapstructure:"amend" yaml:"amend"`
+	Lang         string   `mapstructure:"lang" yaml:"lang"`
 }
 
 // AIConfig describes AI provider settings.
 type AIConfig struct {
-	Provider         string  `mapstructure:"provider"`
-	APIKey           string  `mapstructure:"api_key"`
-	BaseURL          string  `mapstructure:"base_url"`
-	Model            string  `mapstructure:"model"`
-	MaxTokens        int     `mapstructure:"max_tokens"`
-	Temperature      float32 `mapstructure:"temperature"`
-	TopP             float32 `mapstructure:"top_p"`
-	PresencePenalty  float32 `mapstructure:"presence_penalty"`
-	FrequencyPenalty float32 `mapstructure:"frequency_penalty"`
+	Provider         string  `mapstructure:"provider" yaml:"provider"`
+	APIKey           string  `mapstructure:"api_key" yaml:"api_key"`
+	BaseURL          string  `mapstructure:"base_url" yaml:"base_url"`
+	Model            string  `mapstructure:"model" yaml:"model"`
+	MaxTokens        int     `mapstructure:"max_tokens" yaml:"max_tokens"`
+	Temperature      float32 `mapstructure:"temperature" yaml:"temperature"`
+	TopP             float32 `mapstructure:"top_p" yaml:"top_p"`
+	PresencePenalty  float32 `mapstructure:"presence_penalty" yaml:"presence_penalty"`
+	FrequencyPenalty float32 `mapstructure:"frequency_penalty" yaml:"frequency_penalty"`
 }
 
 // ProxyConfig tracks proxy configuration fields.
 type ProxyConfig struct {
-	ProxyURL   string        `mapstructure:"proxy_url"`
-	SocksURL   string        `mapstructure:"socks_url"`
-	Timeout    time.Duration `mapstructure:"timeout"`
-	Headers    []string      `mapstructure:"headers"`
-	SkipVerify bool          `mapstructure:"skip_verify"`
+	ProxyURL   string        `mapstructure:"proxy_url" yaml:"proxy_url"`
+	SocksURL   string        `mapstructure:"socks_url" yaml:"socks_url"`
+	Timeout    time.Duration `mapstructure:"timeout" yaml:"timeout"`
+	Headers    []string      `mapstructure:"headers" yaml:"headers"`
+	SkipVerify bool          `mapstructure:"skip_verify" yaml:"skip_verify"`
 }
 
 // RuntimeConfig stores command runtime options.
 type RuntimeConfig struct {
-	Review ReviewRuntime `mapstructure:"review"`
-	Commit CommitRuntime `mapstructure:"commit"`
+	Review ReviewRuntime `mapstructure:"review" yaml:"review"`
+	Commit CommitRuntime `mapstructure:"commit" yaml:"commit"`
 }
 
 // ReviewRuntime captures review command runtime flags.
 type ReviewRuntime struct {
-	Mode       string `mapstructure:"mode"`
-	Stream     bool   `mapstructure:"stream"`
-	DiffFile   string `mapstructure:"diff_file"`
-	MaxInput   int    `mapstructure:"max_input_size"`
-	OutputLang string `mapstructure:"output_lang"`
+	Mode       string `mapstructure:"mode" yaml:"mode"`
+	Stream     bool   `mapstructure:"stream" yaml:"stream"`
+	DiffFile   string `mapstructure:"diff_file" yaml:"diff_file"`
+	MaxInput   int    `mapstructure:"max_input_size" yaml:"max_input_size"`
+	OutputLang string `mapstructure:"output_lang" yaml:"output_lang"`
 }
 
 // CommitRuntime captures commit command runtime flags.
 type CommitRuntime struct {
-	Preview    bool   `mapstructure:"preview"`
-	OutputLang string `mapstructure:"output_lang"`
+	Preview    bool   `mapstructure:"preview" yaml:"preview"`
+	OutputLang string `mapstructure:"output_lang" yaml:"output_lang"`
 }
 
 // NewDefault returns configuration populated with default values.

@@ -6,6 +6,9 @@ import (
 	"runtime"
 	"testing"
 
+	tea "github.com/charmbracelet/bubbletea"
+	"github.com/loveRyujin/ReviewBot/pkg/config"
+	"github.com/loveRyujin/ReviewBot/pkg/form"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -88,22 +91,46 @@ func TestResolveConfigFilePath(t *testing.T) {
 	}
 }
 
-func TestEnsureConfigDir(t *testing.T) {
-	tmpDir := t.TempDir()
-	configPath := filepath.Join(tmpDir, "reviewbot", "config.yaml")
+func TestInitConfigRoundTrip(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "settings", "reviewbot.yaml")
+	first := form.NewModel()
+	require.NoError(t, saveInitConfig(path, &first))
+	require.NoFileExists(t, path)
 
-	err := ensureConfigDir(configPath)
-	assert.NoError(t, err)
+	submit := func(m *form.Model, fields ...string) {
+		for _, value := range fields {
+			if value != "" {
+				m.Update(tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune(value)})
+			}
+			m.Update(tea.KeyMsg{Type: tea.KeyEnter})
+		}
+	}
+	submit(&first, "", "fake-existing-key", "old-model", "")
+	require.NoError(t, saveInitConfig(path, &first))
 
-	// Verify directory was created
-	dirPath := filepath.Dir(configPath)
-	info, err := os.Stat(dirPath)
-	assert.NoError(t, err)
-	assert.True(t, info.IsDir())
+	second := form.NewModel()
+	submit(&second, "", "", "updated-model", "")
+	submit(&second, "") // Enable Git settings.
+	submit(&second, "", "", "", "vendor,dist", "", "")
+	submit(&second, "") // Enable proxy settings.
+	submit(&second, "", "", "", "Authorization=Bearer a,b,X-Trace=1", "")
+	require.NoError(t, saveInitConfig(path, &second))
 
-	// Test idempotency - should not fail if directory already exists
-	err = ensureConfigDir(configPath)
-	assert.NoError(t, err)
+	saved, err := os.ReadFile(path)
+	require.NoError(t, err)
+	require.YAMLEq(t, `ai:
+  api_key: fake-existing-key
+  model: updated-model
+git:
+  exclude_list: [vendor, dist]
+proxy:
+  headers: ["Authorization=Bearer a,b", "X-Trace=1"]
+`, string(saved))
+	cfg, err := config.Load(config.LoadOptions{ExplicitPath: path, EnvPrefix: "REVIEWBOT_INIT_TEST"})
+	require.NoError(t, err)
+	require.Equal(t, "fake-existing-key", cfg.AI.APIKey)
+	require.Equal(t, []string{"vendor", "dist"}, cfg.Git.ExcludedList)
+	require.Equal(t, []string{"Authorization=Bearer a,b", "X-Trace=1"}, cfg.Proxy.Headers)
 }
 
 func TestEnsureDefaultConfigFile(t *testing.T) {

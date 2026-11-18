@@ -62,35 +62,91 @@ func init() {
 	rootCmd.SetHelpFunc(helpF)
 }
 
-// initConfig loads configuration using the new config package.
-func initConfig() error {
-	var err error
-	if configPath == "" {
-		if err := ensureDefaultConfigFile(); err != nil {
-			return err
-		}
-	}
-	globalConfig, err = config.Load(config.LoadOptions{
+func configOptions() (config.LoadOptions, error) {
+	opts := config.LoadOptions{
 		ExplicitPath: configPath,
-		SearchDirs:   searchDirs(),
 		ConfigName:   strings.TrimSuffix(defaultConfigFile, ".yaml"),
 		ConfigType:   "yaml",
 		EnvPrefix:    defaultEnvPrefix,
 		Replacer:     replacer,
-	})
+	}
+	if configPath != "" {
+		return opts, nil
+	}
+	configDir, err := resolveDefaultConfigDir()
+	if err != nil {
+		return opts, err
+	}
+	opts.SearchDirs = []string{"./config/", ".", configDir}
+	return opts, ensureDefaultConfigFile()
+}
+
+func loadCommandConfig(cmd *cobra.Command, _ []string) error {
+	opts, err := configOptions()
+	if err != nil {
+		return err
+	}
+	flags := cmd.Flags()
+	ov := &opts.Overrides
+	if flags.Changed("diff_unified") {
+		ov.Git.DiffUnified = &diffUnifiedLines
+	}
+	if flags.Changed("exclude_list") {
+		ov.Git.ExcludedList = excludedList
+	}
+	if flags.Changed("amend") {
+		ov.Git.Amend = &amend
+	}
+	if flags.Changed("mode") {
+		ov.Review.Mode = mode
+	}
+	if flags.Changed("stream") {
+		ov.Review.Stream = &stream
+	}
+	if flags.Changed("preview") {
+		ov.Commit.Preview = &preview
+	}
+	if flags.Changed("ai-provider") {
+		ov.Provider = aiProviderFlag
+	}
+	if flags.Changed("ai-model") {
+		ov.Model = aiModelFlag
+	}
+
+	globalConfig, err = config.Load(opts)
 	if err != nil {
 		return err
 	}
 
+	git := &globalConfig.Git
+	if cmd.Name() == "review" {
+		review := globalConfig.Runtime.Review
+		if review.DiffFile != "" {
+			git.DiffFile = review.DiffFile
+		}
+		if review.MaxInput > 0 {
+			git.MaxInputSize = review.MaxInput
+		}
+		if review.OutputLang != "" {
+			git.Lang = review.OutputLang
+		}
+	} else if lang := globalConfig.Runtime.Commit.OutputLang; lang != "" {
+		git.Lang = lang
+	}
+	if flags.Changed("diff_file") {
+		git.DiffFile = diffFile
+	}
+	if flags.Changed("max_input_size") {
+		git.MaxInputSize = maxInputSize
+	}
+	if flags.Changed("output_lang") {
+		git.Lang = outputLang
+	}
+	if err := git.Validate(); err != nil {
+		return err
+	}
 	prompt.SetTemplateDir(globalConfig.Prompt.Folder)
 	return nil
-}
-
-// searchDirs returns the directories to search for the config file.
-func searchDirs() []string {
-	configDir, err := resolveDefaultConfigDir()
-	cobra.CheckErr(err)
-	return []string{"./config/", ".", configDir}
 }
 
 func welcome() {

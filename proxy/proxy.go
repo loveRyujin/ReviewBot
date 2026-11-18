@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"golang.org/x/net/http/httpguts"
 	"golang.org/x/net/proxy"
 )
 
@@ -30,6 +31,25 @@ func (c *customTransport) RoundTrip(req *http.Request) (*http.Response, error) {
 	}
 
 	return c.transport.RoundTrip(req)
+}
+
+// ParseHeaders splits a comma-separated list only where a new HTTP field starts.
+func ParseHeaders(input string) []string {
+	if input == "" {
+		return nil
+	}
+	parts := strings.Split(input, ",")
+	var headers []string
+	start := 0
+	for i := 1; i < len(parts); i++ {
+		key, _, ok := strings.Cut(parts[i], "=")
+		if ok && httpguts.ValidHeaderFieldName(strings.TrimSpace(key)) {
+			headers = append(headers, strings.Join(parts[start:i], ","))
+			start = i
+			parts[i] = strings.TrimLeft(parts[i], " \t")
+		}
+	}
+	return append(headers, strings.Join(parts[start:], ","))
 }
 
 // toHTTPHeaders converts a slice of strings in the format "Key=Value" to http.Header.
